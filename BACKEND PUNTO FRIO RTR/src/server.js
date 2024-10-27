@@ -22,6 +22,7 @@ app.use(cors())
 app.use(express.json())
 
 // Rutas
+app.get('/', (req, res) => res.send('Servidor de Punto Frio RTR'))
 app.use('/api/v1', routerUsuario)
 app.use('/api/v1', routerCategoria)
 
