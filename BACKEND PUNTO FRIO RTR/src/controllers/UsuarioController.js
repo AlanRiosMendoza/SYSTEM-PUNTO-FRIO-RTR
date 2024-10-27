@@ -2,7 +2,7 @@ import generarJWT from '../helpers/crearJWT.js'
 import UsuarioModel from '../models/Usuario.js'
 
 export const registro = async (req, res) => {
-  const { correo, contrasenia, nombre, apellido, rol, cedula } = req.body
+  const { correo, contrasenia, nombre, apellido, cedula, rol } = req.body
 
   // Validación de campos vacíos
   if (Object.values(req.body).includes('')) {
@@ -12,9 +12,11 @@ export const registro = async (req, res) => {
   }
 
   // Validación del email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(correo)) {
-    return res.status(400).json({ msg: 'Por favor, proporciona un correo electrónico válido' });
+    return res
+      .status(400)
+      .json({ msg: 'Por favor, proporciona un correo electrónico válido' })
   }
 
   // Validación de la cédula
@@ -126,17 +128,65 @@ export const obtenerUsuario = async (req, res) => {
   res.status(200).json(usuario)
 }
 
-export const actualizarUsuario = (req, res) => {
+export const actualizarUsuario = async (req, res) => {
   const { id } = req.params
-  const { cedula, nombre, apellido, telefono, correo, rol } = req.body
+  const { cedula, nombre, apellido, telefono, correo } = req.body
   const usuario = UsuarioModel.findById(id)
   if (!usuario)
     return res
       .status(404)
       .json({ msg: `Lo sentimos, no existe el usuario ${id}` })
 
+  // Validación de la cédula
+  if (cedula.length !== 10) {
+    return res.status(400).json({ msg: 'La cédula debe tener 10 caracteres' })
+  }
 
-  res.send('PUT USUARIO')
+  // Validación del nombre
+  if (nombre.length < 2) {
+    return res
+      .status(400)
+      .json({ msg: 'El nombre debe tener al menos 2 caracteres' })
+  }
+
+  // Validación del apellido
+  if (apellido.length < 2) {
+    return res
+      .status(400)
+      .json({ msg: 'El apellido debe tener al menos 2 caracteres' })
+  }
+
+  // Validación del email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(correo)) {
+    return res
+      .status(400)
+      .json({ msg: 'Por favor, proporciona un correo electrónico válido' })
+  }
+
+  // Verificar si el email ya está registrado
+  const verificarEmailBDD = await UsuarioModel.findOne({ correo })
+  if (verificarEmailBDD) {
+    return res
+      .status(400)
+      .json({ msg: 'Lo sentimos, el email ya se encuentra registrado' })
+  }
+
+  // Validación del teléfono
+  if (telefono && telefono.length !== 10) {
+    return res.status(400).json({ msg: 'El teléfono debe tener 10 caracteres' })
+  }
+
+  // Actualizar usuario
+  const usuarioActualizado = await UsuarioModel.findByIdAndUpdate(
+    id,
+    req.body,
+    {
+      new: true,
+    },
+  )
+
+  res.status(200).json(usuarioActualizado)
 }
 
 export const recuperarPassword = (req, res) => {
