@@ -7,16 +7,16 @@ const app = express()
 dotenv.config()
 
 // Configuraciones
-app.set('port', process.env.port || 3000)
+app.set('port', process.env.PORT || 3000)
 app.use(cors())
 
 // Middlewares
 app.use(express.json())
 
 // Rutas
-app.use('/api', routerUsuario)
+app.use('/api/v1', routerUsuario)
 
 // Manejo de una ruta que no sea encontrada
-app.use((req, res) => res.status(404).send('Endpoint no encontrado - 404'))
+app.use((req, res) => res.status(404).send('Page not found'))
 
 export default app

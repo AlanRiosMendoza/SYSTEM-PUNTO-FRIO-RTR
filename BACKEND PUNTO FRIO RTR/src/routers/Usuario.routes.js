@@ -2,7 +2,6 @@ import { Router } from 'express'
 import {
   registro,
   login,
-  confirmar,
   obtenerUsuarios,
   obtenerUsuario,
   actualizarUsuario,
@@ -12,6 +11,7 @@ import {
   perfil,
   actualizarPassword,
   desactivarUsuario,
+  cambiarRole,
 } from '../controllers/UsuarioController.js'
 
 const router = Router()
@@ -34,7 +34,9 @@ router.post('/nuevo-password/:token', nuevoPassword)
 
 router.get('/perfil', perfil)
 
-router.put('/veterinario/actualizar-password', actualizarPassword)
+router.put('/actualizar-password', actualizarPassword)
+
+router.put('/cambiar-role/:id', cambiarRole)
 
 router.patch('/desactivar-usuario/:id', desactivarUsuario)
 
