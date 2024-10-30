@@ -5,7 +5,7 @@ import {
   crearCategoria,
   desactivarCategoria,
   obtenerCategoria,
-  obtenerCategorias
+  obtenerCategorias,
 } from '../controllers/CategoriaController.js'
 
 const router = Router()

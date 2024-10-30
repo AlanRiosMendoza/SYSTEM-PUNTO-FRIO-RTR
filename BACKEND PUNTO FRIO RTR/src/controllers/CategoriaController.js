@@ -1,10 +1,9 @@
 import { subirImagen } from '../config/cloudinary.js'
 import CategoriaSchema from '../models/Categoria.js'
-import fs from 'fs-extra';
-
+import fs from 'fs-extra'
 
 export const crearCategoria = async (req, res) => {
-const { nombre, descripcion } = req.body
+  const { nombre, descripcion } = req.body
 
   if (!req.files?.imagen) {
     return res.status(400).json({ msg: 'Se requiere una imagen' })
@@ -16,14 +15,19 @@ const { nombre, descripcion } = req.body
   }
 
   if (await CategoriaSchema.findOne({ nombre }))
-    return res.status(400).json({ msg: 'Ya existe una categoría con ese nombre' })
+    return res
+      .status(400)
+      .json({ msg: 'Ya existe una categoría con ese nombre' })
 
-  const imagenSubida = await subirImagen(req.files.imagen.tempFilePath, 'categorias')
-  
+  const imagenSubida = await subirImagen(
+    req.files.imagen.tempFilePath,
+    'categorias',
+  )
+
   const nuevaCategoria = new CategoriaSchema({
     nombre,
     descripcion,
-    imagen: imagenSubida.secure_url
+    imagen: imagenSubida.secure_url,
   })
 
   await fs.unlink(req.files.imagen.tempFilePath)
@@ -47,8 +51,6 @@ export const obtenerCategoria = async (req, res) => {
       .status(404)
       .json({ msg: `Lo sentimos, no existe la categoría ${id}` })
 
-  
-
   res.status(200).json(categoria)
 }
 
@@ -61,15 +63,20 @@ export const actualizarCategoria = async (req, res) => {
       .json({ msg: `Lo sentimos, no existe la categoría ${id}` })
 
   if (req.files?.imagen) {
-    const imagenSubida = await subirImagen(req.files.imagen.tempFilePath, 'categorias')
+    const imagenSubida = await subirImagen(
+      req.files.imagen.tempFilePath,
+      'categorias',
+    )
     req.body.imagen = imagenSubida.secure_url
     await fs.unlink(req.files.imagen.tempFilePath)
   }
 
   if (req.body.nombre) {
-    const existeCategoria = await CategoriaSchema.findOne({ nombre})
+    const existeCategoria = await CategoriaSchema.findOne({ nombre })
     if (existeCategoria)
-      return res.status(400).json({ msg: 'Ya existe una categoría con ese nombre' })
+      return res
+        .status(400)
+        .json({ msg: 'Ya existe una categoría con ese nombre' })
   }
 
   const categoriaActualizada = await CategoriaSchema.findByIdAndUpdate(
