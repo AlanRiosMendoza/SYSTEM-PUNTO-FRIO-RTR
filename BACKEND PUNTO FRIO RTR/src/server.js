@@ -3,9 +3,9 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import fileUpload from 'express-fileupload'
 
-import routerUsuario from './routers/Usuario.routes.js'
-import routerCategoria from './routers/Categoria.routes.js'
-import routerProducto from './routers/Producto.routes.js'
+import routerUsuario from './routes/Usuario.routes.js'
+import routerCategoria from './routes/Categoria.routes.js'
+import routerProducto from './routes/Producto.routes.js'
 
 const app = express()
 dotenv.config()
