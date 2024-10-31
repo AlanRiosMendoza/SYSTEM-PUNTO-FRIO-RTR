@@ -6,6 +6,7 @@ import {
   actualizarProducto,
   desactivarProducto,
   activarProducto,
+  obtenerProductosDesactivados,
 } from '../controllers/ProductoController.js'
 
 const router = Router()
@@ -16,5 +17,6 @@ router.get('/producto/:id', obtenerProducto)
 router.put('/producto/:id', actualizarProducto)
 router.patch('/producto/:id', desactivarProducto)
 router.patch('/producto/activar/:id', activarProducto)
+router.get('/productos/desactivados', obtenerProductosDesactivados)
 
 export default router
