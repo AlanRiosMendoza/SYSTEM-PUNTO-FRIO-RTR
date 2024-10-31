@@ -115,6 +115,12 @@ export const obtenerUsuarios = async (req, res) => {
   const usuarios = await UsuarioModel.find({ activo: true })
     .skip(skip)
     .limit(limite)
+  if (!usuarios || usuarios.length === 0) {
+    return res.status(404).json({ msg: 'No se encontraron usuarios activos' })
+  }
+
+  
+
   res.status(200).json(usuarios)
 }
 
