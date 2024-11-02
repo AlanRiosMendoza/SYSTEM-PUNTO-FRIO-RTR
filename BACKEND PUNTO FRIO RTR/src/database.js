@@ -5,7 +5,7 @@ mongoose.set('strictQuery', true)
 const connection = async () => {
   try {
     const { connection } = await mongoose.connect(
-      process.env.MONGODB_URL_PRODUCTION,
+      process.env.MONGODB_URL_DEVELOPMENT,
       {},
     )
     console.log(

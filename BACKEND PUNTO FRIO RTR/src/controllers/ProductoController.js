@@ -1,22 +1,25 @@
 import ProductoSchema from '../models/Producto.js'
 import { subirImagen } from '../config/cloudinary.js'
 import fs from 'fs-extra'
+
 import {
-  validarCamposProducto,
   validarImagenRequerida,
-  validarNombreUnico,
   validarObjectId,
-  validarProductoActivo,
-} from '../validations/ProductoValidation.js'
+  validarNombreUnico,
+  validarSiExisten,
+  validarDesactivado,
+  validarActivado,
+  validarCamposVacios,
+} from '../validators/ComunValidators.js'
 
 export const crearProducto = async (req, res) => {
   const imagenError = validarImagenRequerida(req.files)
   if (imagenError) return res.status(400).json({ msg: imagenError.message })
 
-  const camposError = validarCamposProducto(req.body)
+  const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })
 
-  const nombreError = await validarNombreUnico(req.body.nombre)
+  const nombreError = await validarNombreUnico(req.body.nombre, 'producto')
   if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
   const imagenSubida = await subirImagen(
@@ -29,6 +32,7 @@ export const crearProducto = async (req, res) => {
   const nuevoProducto = new ProductoSchema(req.body)
 
   await fs.unlink(req.files.imagen.tempFilePath)
+
   await nuevoProducto.save()
 
   res.status(201).json(nuevoProducto)
@@ -44,9 +48,9 @@ export const obtenerProductos = async (req, res) => {
     .skip(skip)
     .limit(limite)
 
-  if (!productos || productos.length === 0) {
-    return res.status(404).json({ msg: 'No se encontraron productos activos' })
-  }
+  const ExistenciaError = validarSiExisten(productos, 'productos')
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
 
   res.json(productos)
 }
@@ -57,8 +61,11 @@ export const obtenerProducto = async (req, res) => {
 
   const producto = await ProductoSchema.findById(req.params.id)
 
-  const productoError = validarProductoActivo(producto)
-  if (productoError) return res.status(404).json({ msg: productoError.message })
+  const ExistenciaError = validarSiExisten(producto, 'productos')
+  if (ExistenciaError)
+    return res
+      .status(404)
+      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
 
   res.status(200).json(producto)
 }
@@ -68,11 +75,15 @@ export const actualizarProducto = async (req, res) => {
   if (idError) return res.status(400).json({ msg: idError.message })
 
   const producto = await ProductoSchema.findById(req.params.id)
-  if (!producto) {
-    return res.status(404).json({
-      msg: `Lo sentimos, no existe el producto con ID ${req.params.id}`,
-    })
-  }
+
+  const ExistenciaError = validarSiExisten(producto, 'productos')
+  if (ExistenciaError)
+    return res
+      .status(404)
+      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+
+  const nombreError = await validarNombreUnico(req.body.nombre, 'producto')
+  if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
   if (req.files?.imagen) {
     const imagenSubida = await subirImagen(
@@ -83,12 +94,12 @@ export const actualizarProducto = async (req, res) => {
     await fs.unlink(req.files.imagen.tempFilePath)
   }
 
-  const productoNuevo = await ProductoSchema.findByIdAndUpdate(
+  const productoActualizado = await ProductoSchema.findByIdAndUpdate(
     req.params.id,
     req.body,
-    { new: true },
   )
-  res.status(200).json(productoNuevo)
+
+  res.status(200).json(productoActualizado)
 }
 
 export const desactivarProducto = async (req, res) => {
@@ -97,10 +108,18 @@ export const desactivarProducto = async (req, res) => {
 
   const producto = await ProductoSchema.findById(req.params.id)
 
-  const productoError = validarProductoActivo(producto)
-  if (productoError) return res.status(404).json({ msg: productoError.message })
+  const ExistenciaError = validarSiExisten(producto, 'productos')
+  if (ExistenciaError)
+    return res
+      .status(404)
+      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+
+  const desactivadoError = validarDesactivado(producto, 'producto')
+  if (desactivadoError)
+    return res.status(404).json({ msg: desactivadoError.message })
 
   await ProductoSchema.findByIdAndUpdate(req.params.id, { activo: false })
+
   res.status(200).json({ msg: 'Producto desactivado' })
 }
 
@@ -109,13 +128,18 @@ export const activarProducto = async (req, res) => {
   if (idError) return res.status(400).json({ msg: idError.message })
 
   const producto = await ProductoSchema.findById(req.params.id)
-  if (!producto) {
-    return res.status(404).json({
-      msg: `Lo sentimos, no existe el producto con ID ${req.params.id}`,
-    })
-  }
+
+  const ExistenciaError = validarSiExisten(producto, 'productos')
+  if (ExistenciaError)
+    return res
+      .status(404)
+      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+
+  const activadoError = validarActivado(producto, 'producto')
+  if (activadoError) return res.status(404).json({ msg: activadoError.message })
 
   await ProductoSchema.findByIdAndUpdate(req.params.id, { activo: true })
+
   res.status(200).json({ msg: 'Producto activado' })
 }
 
@@ -129,9 +153,9 @@ export const obtenerProductosDesactivados = async (req, res) => {
     .skip(skip)
     .limit(limite)
 
-  if (!productos || productos.length === 0) {
-    return res.status(404).json({ msg: 'No se encontraron productos inactivo' })
-  }
-  
-  res.json(productos)
+  const ExistenciaError = validarSiExisten(productos, 'productos')
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
+
+  res.status(200).json(productos)
 }

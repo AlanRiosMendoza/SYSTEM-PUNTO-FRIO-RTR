@@ -1,93 +1,76 @@
 import generarJWT from '../helpers/crearJWT.js'
-import UsuarioModel from '../models/Usuario.js'
+import UsuarioSchema from '../models/Usuario.js'
+import {
+  validarActivado,
+  validarCamposVacios,
+  validarContrasenia,
+  validarCorreoElectronico,
+  validarCorreoExistente,
+  validarCorreoNoExistente,
+  validarLongitudNumero,
+  validarLongitudPalabra,
+  validarObjectId,
+  validarRol,
+  validarSiExisten,
+} from '../validators/ComunValidators.js'
 
 export const registro = async (req, res) => {
-  const { correo, contrasenia, nombre, apellido, cedula, rol } = req.body
+  const camposVaciosError = validarCamposVacios(req.body)
+  if (camposVaciosError)
+    return res.status(400).json({ msg: camposVaciosError.message })
 
-  // Validación de campos vacíos
-  if (Object.values(req.body).includes('')) {
-    return res
-      .status(400)
-      .json({ msg: 'Lo sentimos, debes llenar todos los campos' })
-  }
+  const correoError = validarCorreoElectronico(req.body.correo)
+  if (correoError) return res.status(400).json({ msg: correoError.message })
 
-  // Validación del email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(correo)) {
-    return res
-      .status(400)
-      .json({ msg: 'Por favor, proporciona un correo electrónico válido' })
-  }
+  const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cedula')
+  if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
 
-  // Validación de la cédula
-  if (cedula.length !== 10) {
-    // Corregido aquí
-    return res.status(400).json({ msg: 'La cédula debe tener 10 caracteres' })
-  }
+  const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'telefono')
+  if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
 
-  // Validación de la contraseña
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/ // Nueva regex
-  if (!passwordRegex.test(contrasenia)) {
-    return res.status(400).json({
-      msg: 'La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra mayúscula, una letra minúscula y un carácter especial.',
-    })
-  }
+  const contraseniaError = validarContrasenia(req.body.contrasenia)
+  if (contraseniaError)
+    return res.status(400).json({ msg: contraseniaError.message })
 
-  // Validación del nombre
-  if (nombre.length < 2) {
-    return res
-      .status(400)
-      .json({ msg: 'El nombre debe tener al menos 2 caracteres' })
-  }
+  const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre')
+  if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
-  // Validación del apellido
-  if (apellido.length < 2) {
-    return res
-      .status(400)
-      .json({ msg: 'El apellido debe tener al menos 2 caracteres' })
-  }
+  const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
+  if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
 
-  // Verificar si el email ya está registrado
-  const verificarEmailBDD = await UsuarioModel.findOne({ correo }) // Corregido aquí
-  if (verificarEmailBDD) {
-    return res
-      .status(400)
-      .json({ msg: 'Lo sentimos, el email ya se encuentra registrado' })
-  }
+  const correoExistenteError = await validarCorreoExistente(req.body.correo)
+  if (correoExistenteError)
+    return res.status(400).json({ msg: correoExistenteError.message })
 
-  // Validación del rol
-  const rolesPermitidos = ['administrador', 'cajero']
-  if (!rolesPermitidos.includes(rol)) {
-    return res
-      .status(400)
-      .json({ msg: 'El rol debe ser "administrador" o "cajero"' })
-  }
+  const rolError = validarRol(req.body.rol)
+  if (rolError) return res.status(400).json({ msg: rolError.message })
 
-  // Crear nuevo usuario
-  const nuevoUsuario = new UsuarioModel(req.body)
-  nuevoUsuario.contrasenia = await nuevoUsuario.encryptPassword(contrasenia)
+  const nuevoUsuario = new UsuarioSchema(req.body)
+
+  nuevoUsuario.contrasenia = await nuevoUsuario.encryptPassword(
+    req.body.contrasenia,
+  )
+
   await nuevoUsuario.save()
 
-  res.status(201).json({ usuario: nuevoUsuario })
+  res.status(201).json({ nuevoUsuario })
 }
 
 export const login = async (req, res) => {
   const { correo, contrasenia } = req.body
 
-  // Verificar que no haya campos vacíos
-  if (Object.values(req.body).includes('')) {
-    return res
-      .status(400)
-      .json({ msg: 'Lo sentimos, debes llenar todos los campos' })
-  }
+  const camposVaciosError = validarCamposVacios(req.body)
+  if (camposVaciosError)
+    return res.status(400).json({ msg: camposVaciosError.message })
 
-  // Verificar si el usuario existe
-  const usuario = await UsuarioModel.findOne({ correo })
-  if (!usuario) {
-    return res
-      .status(404)
-      .json({ msg: 'Usuario no encontrado. Por favor, verifica tu correo.' })
-  }
+  const correoError = validarCorreoElectronico(correo)
+  if (correoError) return res.status(400).json({ msg: correoError.message })
+
+  const correoNoExistenteError = await validarCorreoNoExistente(correo)
+  if (correoNoExistenteError)
+    return res.status(404).json({ msg: correoNoExistenteError.message })
+
+  const usuario = await UsuarioSchema.findOne({ correo })
 
   const verificarPassword = await usuario.matchPassword(contrasenia)
   if (!verificarPassword) {
@@ -112,84 +95,74 @@ export const obtenerUsuarios = async (req, res) => {
 
   const skip = (pagina - 1) * limite
 
-  const usuarios = await UsuarioModel.find({ activo: true })
+  const usuarios = await UsuarioSchema.find({ activo: true })
     .skip(skip)
     .limit(limite)
-  if (!usuarios || usuarios.length === 0) {
-    return res.status(404).json({ msg: 'No se encontraron usuarios activos' })
-  }
 
-  
+  const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
 
   res.status(200).json(usuarios)
 }
 
 export const obtenerUsuario = async (req, res) => {
-  const { id } = req.params
-  const usuario = await UsuarioModel.findById(id)
-  if (!usuario)
+  const idError = validarObjectId(req.params.id)
+  if (idError) return res.status(400).json({ msg: idError.message })
+
+  const usuario = await UsuarioSchema.findById(req.params.id)
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuario')
+  if (ExistenciaError)
     return res
       .status(404)
-      .json({ msg: `Lo sentimos, no existe el usuario ${id}` })
+      .json({ msg: `No se encontró el usuario con ese ID: ${req.params.id}` })
+
   res.status(200).json(usuario)
 }
 
 export const actualizarUsuario = async (req, res) => {
-  const { id } = req.params
-  const { cedula, nombre, apellido, telefono, correo } = req.body
-  const usuario = UsuarioModel.findById(id)
-  if (!usuario)
+  const idError = validarObjectId(req.params.id)
+  if (idError) return res.status(400).json({ msg: idError.message })
+
+  const usuario = await UsuarioSchema.findById(req.params.id)
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuario')
+  if (ExistenciaError)
     return res
       .status(404)
-      .json({ msg: `Lo sentimos, no existe el usuario ${id}` })
+      .json({ msg: `No se encontró un usuario con el ID: ${req.params.id}` })
 
-  // Validación de la cédula
-  if (cedula.length !== 10) {
-    return res.status(400).json({ msg: 'La cédula debe tener 10 caracteres' })
-  }
+  // Validación de campos específicos
+  const camposVaciosError = validarCamposVacios(req.body)
+  if (camposVaciosError)
+    return res.status(400).json({ msg: camposVaciosError.message })
 
-  // Validación del nombre
-  if (nombre.length < 2) {
-    return res
-      .status(400)
-      .json({ msg: 'El nombre debe tener al menos 2 caracteres' })
-  }
+  const correoError = validarCorreoElectronico(req.body.correo)
+  if (correoError) return res.status(400).json({ msg: correoError.message })
 
-  // Validación del apellido
-  if (apellido.length < 2) {
-    return res
-      .status(400)
-      .json({ msg: 'El apellido debe tener al menos 2 caracteres' })
-  }
+  const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
+  if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
 
-  // Validación del email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(correo)) {
-    return res
-      .status(400)
-      .json({ msg: 'Por favor, proporciona un correo electrónico válido' })
-  }
+  const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre')
+  if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
-  // Verificar si el email ya está registrado
-  const verificarEmailBDD = await UsuarioModel.findOne({ correo })
-  if (verificarEmailBDD) {
-    return res
-      .status(400)
-      .json({ msg: 'Lo sentimos, el email ya se encuentra registrado' })
-  }
+  const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
+  if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
 
-  // Validación del teléfono
-  if (telefono && telefono.length !== 10) {
-    return res.status(400).json({ msg: 'El teléfono debe tener 10 caracteres' })
-  }
+  const correoExistenteError = await validarCorreoExistente(req.body.correo)
+  if (correoExistenteError)
+    return res.status(400).json({ msg: correoExistenteError.message })
 
-  // Actualizar usuario
-  const usuarioActualizado = await UsuarioModel.findByIdAndUpdate(
-    id,
+  const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
+  if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
+
+  const rolError = validarRol(req.body.rol)
+  if (rolError) return res.status(400).json({ msg: rolError.message })
+
+  const usuarioActualizado = await UsuarioSchema.findByIdAndUpdate(
+    req.params.id,
     req.body,
-    {
-      new: true,
-    },
   )
 
   res.status(200).json(usuarioActualizado)
@@ -207,18 +180,103 @@ export const nuevoPassword = (req, res) => {
   res.send('crear password')
 }
 
-export const perfil = (req, res) => {
-  res.send('perfil')
+export const perfil = async (req, res) => {
+  const usuario = await UsuarioSchema.findById()
+
+  res.status(200).json(usuario)
 }
 
-export const actualizarPassword = (req, res) => {
+export const actualizarPassword = async (req, res) => {
+  const { antiguaContrasenia, Contrasenia, confirmarContrasenia } = req.body
+
+  const verificarPassword = await usuario.matchPassword(antiguaContrasenia)
+  if (!verificarPassword) {
+    return res.status(401).json({
+      msg: 'Contraseña incorrecta. Por favor, verifica tu contraseña.',
+    })
+  }
+
   res.send('actualizar password')
 }
 
-export const cambiarRole = (req, res) => {
-  res.send('cambiar role')
+export const cambiarRole = async (req, res) => {
+  const idError = validarObjectId(req.params.id)
+  if (idError) return res.status(400).json({ msg: idError.message })
+
+  const usuario = await UsuarioSchema.findById(req.params.id)
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuarios')
+  if (ExistenciaError)
+    return res
+      .status(404)
+      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+
+  const rolError = validarRol(req.body.rol)
+  if (rolError) return res.status(400).json({ msg: rolError.message })
+
+  usuario.rol = req.body.rol
+
+  await usuario.save()
+
+  res.status(200).json({ usuario })
 }
 
-export const desactivarUsuario = (req, res) => {
-  res.send('desactivar usuario')
+export const desactivarUsuario = async (req, res) => {
+  const idError = validarObjectId(req.params.id)
+  if (idError) return res.status(400).json({ msg: idError.message })
+
+  const usuario = await UsuarioSchema.findById(req.params.id)
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuarios')
+  if (ExistenciaError)
+    return res.status(404).json({
+      msg: `No se encontró el usuario con ese ID: ${req.params.id}`,
+    })
+
+  const desactivadoError = validarDesactivado(usuario, 'usuario')
+  if (desactivadoError)
+    return res.status(404).json({ msg: desactivadoError.message })
+
+  await UsuarioSchema.findByIdAndUpdate(req.params.id, { activo: false })
+
+  res.status(200).json({ msg: 'Categoría desactivada' })
+}
+
+export const activarUsuario = async (req, res) => {
+  const idError = validarObjectId(req.params.id)
+  if (idError) return res.status(400).json({ msg: idError.message })
+
+  const usuario = await UsuarioSchema.findById(req.params.id)
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuarios')
+  if (ExistenciaError)
+    return res.status(404).json({
+      msg: `No se encontró el usuario con ese ID: ${req.params.id}`,
+    })
+
+  const activadoError = validarActivado(usuario, 'usuario')
+  if (activadoError) return res.status(404).json({ msg: activadoError.message })
+
+  await UsuarioSchema.findByIdAndUpdate(req.params.id, { activo: true })
+
+  res.status(200).json({ msg: 'Usuario activado' })
+}
+
+export const obtenerUsuariosDesactivados = async (req, res) => {
+  const pagina = parseInt(req.query.pagina) || 1
+  const limite = parseInt(req.query.limite) || 10
+
+  const skip = (pagina - 1) * limite
+
+  const usuarios = await UsuarioSchema.find({ activo: false })
+    .skip(skip)
+    .limit(limite)
+
+  const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
+  if (ExistenciaError)
+    return res.status(404).json({
+      msg: 'No se encontraron usuarios desactivados',
+    })
+
+  res.status(200).json(usuarios)
 }
