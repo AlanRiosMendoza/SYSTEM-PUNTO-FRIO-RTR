@@ -13,6 +13,7 @@ import {
   desactivarUsuario,
   cambiarRole,
 } from '../controllers/UsuarioController.js'
+import verificarAutenticacion from '../middlewares/autenticacion.js'
 
 const router = Router()
 
@@ -32,7 +33,7 @@ router.post('/recuperar-password/:token', verificarToken)
 
 router.post('/nuevo-password/:token', nuevoPassword)
 
-router.get('/perfil', perfil)
+router.get('/perfil', verificarAutenticacion, perfil)
 
 router.put('/actualizar-password', actualizarPassword)
 

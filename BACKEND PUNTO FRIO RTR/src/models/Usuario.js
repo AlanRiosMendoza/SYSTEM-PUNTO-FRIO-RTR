@@ -17,6 +17,7 @@ const usuarioSchema = new Schema(
     },
     fechaUltimoAcceso: { type: Date, default: null },
     activo: { type: Boolean, default: true },
+    token: { type: String, default: null },
   },
   {
     timestamps: true,

@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import CategoriaSchema from '../models/Categoria.js'
 import ProductoSchema from '../models/Producto.js'
 import UsuarioSchema from '../models/Usuario.js'
+import ClientesSchema from '../models/Clientes.js'
 
 export const validarImagenRequerida = (files) => {
   if (!files?.imagen) {
@@ -18,23 +19,23 @@ export const validarObjectId = (id) => {
   return null
 }
 
-export const validarNombreUnico = async (nombre, schema) => {
-  if (schema === 'categoria') {
-    const categoriaExistente = await CategoriaSchema.findOne({ nombre })
+export const validarNombreUnico = async (schema, nombre) => {
+  if (nombre === 'categoria') {
+    const categoriaExistente = await CategoriaSchema.findOne({ schema })
     if (categoriaExistente) {
       return { error: true, message: `Ya existe una categoría con ese nombre` }
     }
   }
-  if (schema === 'producto') {
-    const productoExistente = await ProductoSchema.findOne({ nombre })
+  if (nombre === 'producto') {
+    const productoExistente = await ProductoSchema.findOne({ schema })
     if (productoExistente) {
       return { error: true, message: `Ya existe un producto con ese nombre` }
     }
-    if (schema === 'usuario') {
-      const usuarioExistente = await UsuarioSchema.findOne({ nombre })
-      if (usuarioExistente) {
-        return { error: true, message: `Ya existe un producto con ese nombre` }
-      }
+  }
+  if (nombre === 'usuario') {
+    const usuarioExistente = await UsuarioSchema.findOne({ schema })
+    if (usuarioExistente) {
+      return { error: true, message: `Ya existe un producto con ese nombre` }
     }
   }
   return null
@@ -157,6 +158,22 @@ export const validarRol = (rol) => {
     return {
       error: true,
       message: 'El rol debe ser "administrador" o "cajero"',
+    }
+  }
+  return null
+}
+
+export const validarCedulaUnica = async (schema, nombre) => {
+  if (nombre === 'usuario') {
+    const usuarioExistente = await UsuarioSchema.findOne({ schema })
+    if (usuarioExistente) {
+      return { error: true, message: 'Ya existe un usuario con esa cédula' }
+    }
+  }
+  if (nombre === 'cliente') {
+    const clienteExistente = await ClientesSchema.findOne({ schema })
+    if (clienteExistente) {
+      return { error: true, message: 'Ya existe un cliente con esa cédula' }
     }
   }
   return null

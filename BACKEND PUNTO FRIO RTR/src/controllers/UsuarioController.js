@@ -1,3 +1,4 @@
+import sendMailToUser from '../config/nodemailer.js'
 import generarJWT from '../helpers/crearJWT.js'
 import UsuarioSchema from '../models/Usuario.js'
 import {
@@ -38,9 +39,9 @@ export const registro = async (req, res) => {
   const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
   if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
 
-  const correoExistenteError = await validarCorreoExistente(req.body.correo)
-  if (correoExistenteError)
-    return res.status(400).json({ msg: correoExistenteError.message })
+  const correoUnicoError = await validarCorreoExistente(req.body.correo)
+  if (correoUnicoError)
+    return res.status(400).json({ msg: correoUnicoError.message })
 
   const rolError = validarRol(req.body.rol)
   if (rolError) return res.status(400).json({ msg: rolError.message })
@@ -70,7 +71,7 @@ export const login = async (req, res) => {
   if (correoNoExistenteError)
     return res.status(404).json({ msg: correoNoExistenteError.message })
 
-  const usuario = await UsuarioSchema.findOne({ correo })
+  const usuario = await UsuarioSchema.findOne({ correo, activo: true })
 
   const verificarPassword = await usuario.matchPassword(contrasenia)
   if (!verificarPassword) {
@@ -133,7 +134,6 @@ export const actualizarUsuario = async (req, res) => {
       .status(404)
       .json({ msg: `No se encontró un usuario con el ID: ${req.params.id}` })
 
-  // Validación de campos específicos
   const camposVaciosError = validarCamposVacios(req.body)
   if (camposVaciosError)
     return res.status(400).json({ msg: camposVaciosError.message })
@@ -168,22 +168,70 @@ export const actualizarUsuario = async (req, res) => {
   res.status(200).json(usuarioActualizado)
 }
 
-export const recuperarPassword = (req, res) => {
-  res.send('enviar mail')
+export const recuperarPassword = async (req, res) => {
+  const camposError = validarCamposVacios(req.body)
+  if (camposError) return res.status(400).json({ msg: camposError.message })
+
+  const correoError = validarCorreoElectronico(req.body.correo)
+  if (correoError) return res.status(400).json({ msg: correoError.message })
+
+  const usuario = await UsuarioSchema.findOne({ correo: req.body.correo })
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuario')
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
+
+  const token = usuario.crearToken()
+  sendMailToUser(usuario.correo, token)
+  usuario.token = token
+  await usuario.save()
+
+  res.status(200).json({ msg: 'Correo enviado' })
 }
 
-export const verificarToken = (req, res) => {
-  res.send('verificar token')
+export const verificarToken = async (req, res) => {
+  camposError = validarCamposVacios(req.body)
+  if (camposError) return res.status(400).json({ msg: camposError.message })
+
+  const usuario = await UsuarioSchema.findOne({ token: req.params.token })
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuario')
+  if (ExistenciaError) return res.status(404).json({ msg: ExistenciaError.message })
+
+  if (usuario.token !== req.params.token) {
+    return res.status(400).json({ msg: 'Token inválido' })
+  }
+
+  res.status(200).json({ msg: 'Token verificado' })
 }
 
-export const nuevoPassword = (req, res) => {
-  res.send('crear password')
+export const nuevoPassword = async (req, res) => {
+  const camposError = validarCamposVacios(req.body)
+  if (camposError) return res.status(400).json({ msg: camposError.message })
+
+  const usuario = await UsuarioSchema.findOne({ token: req.params.token })
+
+  const ExistenciaError = validarSiExisten(usuario, 'usuario')
+  if (ExistenciaError) return res.status(404).json({ msg: ExistenciaError.message })
+
+  if (usuario.token !== req.params.token) {
+    return res.status(400).json({ msg: 'Token inválido' })
+  }
+
+  const contraseniaError = validarContrasenia(req.body.contrasenia)
+  if (contraseniaError)
+    return res.status(400).json({ msg: contraseniaError.message })
+
+  usuario.contrasenia = await usuario.encryptPassword(req.body.contrasenia)
+  usuario.token = null
+
+  await usuario.save()
+
+  res.status(200).json({ msg: 'Contraseña actualizada' })
 }
 
 export const perfil = async (req, res) => {
-  const usuario = await UsuarioSchema.findById()
-
-  res.status(200).json(usuario)
+  res.status(200).json(req.UsuarioSchema)
 }
 
 export const actualizarPassword = async (req, res) => {
