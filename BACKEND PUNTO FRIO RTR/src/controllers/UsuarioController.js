@@ -8,6 +8,7 @@ import {
   validarCorreoElectronico,
   validarCorreoExistente,
   validarCorreoNoExistente,
+  validarDesactivado,
   validarLongitudNumero,
   validarLongitudPalabra,
   validarObjectId,
@@ -190,13 +191,11 @@ export const recuperarPassword = async (req, res) => {
 }
 
 export const verificarToken = async (req, res) => {
-  camposError = validarCamposVacios(req.body)
-  if (camposError) return res.status(400).json({ msg: camposError.message })
-
   const usuario = await UsuarioSchema.findOne({ token: req.params.token })
 
   const ExistenciaError = validarSiExisten(usuario, 'usuario')
-  if (ExistenciaError) return res.status(404).json({ msg: ExistenciaError.message })
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
 
   if (usuario.token !== req.params.token) {
     return res.status(400).json({ msg: 'Token inválido' })
@@ -212,7 +211,8 @@ export const nuevoPassword = async (req, res) => {
   const usuario = await UsuarioSchema.findOne({ token: req.params.token })
 
   const ExistenciaError = validarSiExisten(usuario, 'usuario')
-  if (ExistenciaError) return res.status(404).json({ msg: ExistenciaError.message })
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
 
   if (usuario.token !== req.params.token) {
     return res.status(400).json({ msg: 'Token inválido' })
@@ -235,7 +235,16 @@ export const perfil = async (req, res) => {
 }
 
 export const actualizarPassword = async (req, res) => {
-  const { antiguaContrasenia, Contrasenia, confirmarContrasenia } = req.body
+  const { antiguaContrasenia, contrasenia } = req.body
+
+  const camposError = validarCamposVacios(req.body)
+  if (camposError) return res.status(400).json({ msg: camposError.message })
+
+  const contraseniaError = validarContrasenia(contrasenia)
+  if (contraseniaError)
+    return res.status(400).json({ msg: contraseniaError.message })
+
+  const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id)
 
   const verificarPassword = await usuario.matchPassword(antiguaContrasenia)
   if (!verificarPassword) {
@@ -244,7 +253,11 @@ export const actualizarPassword = async (req, res) => {
     })
   }
 
-  res.send('actualizar password')
+  usuario.contrasenia = await usuario.encryptPassword(contrasenia)
+
+  await usuario.save()
+
+  res.status(200).json({ msg: 'Contraseña actualizada' })
 }
 
 export const cambiarRole = async (req, res) => {
@@ -287,7 +300,7 @@ export const desactivarUsuario = async (req, res) => {
 
   await UsuarioSchema.findByIdAndUpdate(req.params.id, { activo: false })
 
-  res.status(200).json({ msg: 'Categoría desactivada' })
+  res.status(200).json({ msg: 'Usuario desactivado' })
 }
 
 export const activarUsuario = async (req, res) => {
