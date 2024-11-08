@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose'
 
 const ventaSchema = new Schema({
-  cliente_id: { type: Schema.Types.ObjectId, ref: 'Cliente' },
-  total: { type: Number, required: true },
+  cliente_cedula: { type: Number, ref: 'Cliente' },
+  Usuario_id: { type: Schema.Types.ObjectId, ref: 'Usuario' },
+  total: { type: Number },
   fecha: { type: Date, default: Date.now },
-  metodo_pago: { type: String, required: true },
 })
 
 export default model('Venta', ventaSchema)
