@@ -1,4 +1,4 @@
-import DetalleInventarioSchema from '../models/DetalleInventario'
+import DetalleInventarioSchema from '../models/DetalleInventario.js'
 
 export const crearDetalleInventario = async (req, res) => {
   const idError = validarObjectId(req.body.producto_id)

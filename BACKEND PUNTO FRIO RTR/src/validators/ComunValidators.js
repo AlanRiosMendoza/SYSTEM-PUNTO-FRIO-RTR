@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import CategoriaSchema from '../models/Categoria.js'
 import ProductoSchema from '../models/Producto.js'
 import UsuarioSchema from '../models/Usuario.js'
-import ClientesSchema from '../models/Clientes.js'
+import ClienteSchema from '../models/Cliente.js'
 
 export const validarImagenRequerida = (files) => {
   if (!files?.imagen) {
@@ -171,7 +171,7 @@ export const validarCedulaUnica = async (schema, nombre) => {
     }
   }
   if (nombre === 'cliente') {
-    const clienteExistente = await ClientesSchema.findOne({ schema })
+    const clienteExistente = await ClienteSchema.findOne({ schema })
     if (clienteExistente) {
       return { error: true, message: 'Ya existe un cliente con esa cédula' }
     }

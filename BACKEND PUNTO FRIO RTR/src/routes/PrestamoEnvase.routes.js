@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { verificarCajero } from '../middlewares/autenticacion.js'
 import {
   crearPrestamoEnvase,
-  obtenerPrestamoEnvase,
+  obtenerPrestamosEnvase,
   obtenerPrestamoEnvase,
   devolverPrestamoEnvase,
 } from '../controllers/PrestamoEnvaseController.js'
@@ -11,11 +11,11 @@ const router = Router()
 
 router.post('/prestamo-envase', verificarCajero, crearPrestamoEnvase)
 
-router.get('/prestamos-envase', verificarCajero, obtenerPrestamoEnvase)
+router.get('/prestamos-envase', verificarCajero, obtenerPrestamosEnvase)
 
 router.get('/prestamo-envase/:id', verificarCajero, obtenerPrestamoEnvase)
 
-router.patch(
+router.put(
   '/prestamo-envase/devolver/:id',
   verificarCajero,
   devolverPrestamoEnvase,

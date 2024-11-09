@@ -1,3 +1,5 @@
+import ClienteSchema from '../models/Cliente.js'
+
 export const crearCliente = async (req, res) => {
   const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })

@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
-import VentaSchema from '../models/Venta'
-import DetalleVentaSchema from '../models/DetalleVenta'
-import ProductoSchema from '../models/Producto'
-import DetalleInventarioSchema from '../models/DetalleInventario'
+import VentaSchema from '../models/Venta.js'
+import DetalleVentaSchema from '../models/DetalleVenta.js'
+import ProductoSchema from '../models/Producto.js'
+import DetalleInventarioSchema from '../models/DetalleInventario.js'
 
 export const crearVenta = async (req, res) => {
   const { cedulaCliente, productos } = req.body

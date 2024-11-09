@@ -1,4 +1,4 @@
-import PrestamoEnvaseSchema from '../models/PrestamoEnvase'
+import PrestamoEnvaseSchema from '../models/PrestamoEnvase.js'
 
 export const crearPrestamoEnvase = async (req, res) => {
   const clienteError = validarObjectId(req.body.cliente_id)
