@@ -6,7 +6,7 @@ import DetalleInventarioSchema from '../models/DetalleInventario'
 
 export const crearVenta = async (req, res) => {
   const { cedulaCliente, productos } = req.body
-  const { id:usuarioId } = req.UsuarioSchema
+  const { id: usuarioId } = req.UsuarioSchema
 
   const session = await mongoose.startSession()
   session.startTransaction()
@@ -74,7 +74,7 @@ export const crearVenta = async (req, res) => {
         cantidad: prod.cantidad,
         tipo_movimiento: 'salida',
         venta_id: venta._id,
-        descripcion: "Venta de producto",
+        descripcion: 'Venta de producto',
       })
 
       await detalleInventario.save({ session })
@@ -90,7 +90,6 @@ export const crearVenta = async (req, res) => {
     res.status(404).json({ msg: error.message })
   }
 }
-
 
 export const obtenerVentas = async (req, res) => {
   const ventas = await VentaSchema.find()

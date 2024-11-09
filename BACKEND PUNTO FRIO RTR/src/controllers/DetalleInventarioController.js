@@ -1,7 +1,6 @@
 import DetalleInventarioSchema from '../models/DetalleInventario'
 
 export const crearDetalleInventario = async (req, res) => {
-	
   const idError = validarObjectId(req.body.producto_id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
@@ -43,11 +42,9 @@ export const obtenerDetalleInventarioPorId = async (req, res) => {
     'detalleInventario',
   )
   if (ExistenciaError)
-    return res
-      .status(404)
-      .json({
-        msg: `No se encontró ese detalle de inventario con ese ID: ${req.params.id}`,
-      })
+    return res.status(404).json({
+      msg: `No se encontró ese detalle de inventario con ese ID: ${req.params.id}`,
+    })
 
   res.status(200).json(detalleInventario)
 }
