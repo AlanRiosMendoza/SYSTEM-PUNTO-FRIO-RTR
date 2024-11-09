@@ -5,13 +5,14 @@ import {
   obtenerVentas,
   obtenerVenta,
 } from '../controllers/VentaController.js'
+import { verificarAutenticacion, verificarCajero } from '../middlewares/autenticacion.js'
 
 const router = Router()
 
-router.post('/venta', crearVenta)
+router.post('/venta', verificarCajero, crearVenta)
 
-router.get('/ventas', obtenerVentas)
+router.get('/ventas',verificarAutenticacion, obtenerVentas)
 
-router.get('/venta/:id', obtenerVenta)
+router.get('/venta/:id', verificarAutenticacion, obtenerVenta)
 
 export default router

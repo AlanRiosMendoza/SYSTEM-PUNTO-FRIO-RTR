@@ -2,15 +2,17 @@ import mongoose from 'mongoose'
 import VentaSchema from '../models/Venta'
 import DetalleVentaSchema from '../models/DetalleVenta'
 import ProductoSchema from '../models/Producto'
+import DetalleInventarioSchema from '../models/DetalleInventario'
 
 export const crearVenta = async (req, res) => {
   const { cedulaCliente, productos } = req.body
-  const { usuarioId } = req.UsuarioSchema
+  const { id:usuarioId } = req.UsuarioSchema
 
   const session = await mongoose.startSession()
   session.startTransaction()
 
   try {
+    // Verificar disponibilidad de stock para cada producto
     for (const prod of productos) {
       const producto = await ProductoSchema.findById(prod.productoId).session(
         session,
@@ -29,11 +31,13 @@ export const crearVenta = async (req, res) => {
       }
     }
 
+    // Calcular el total de la venta
     let total = 0
     productos.forEach((prod) => {
       total += prod.cantidad * prod.precioUnitario
     })
 
+    // Crear la venta
     const venta = new VentaSchema({
       cedulaCliente,
       usuarioId,
@@ -42,11 +46,13 @@ export const crearVenta = async (req, res) => {
 
     await venta.save({ session })
 
+    // Procesar cada producto en la venta
     for (const prod of productos) {
       const producto = await ProductoSchema.findById(prod.productoId).session(
         session,
       )
 
+      // Crear el detalle de venta
       const detalleVenta = new DetalleVentaSchema({
         ventaId: venta._id,
         productoId: prod.productoId,
@@ -57,8 +63,21 @@ export const crearVenta = async (req, res) => {
 
       await detalleVenta.save({ session })
 
+      // Actualizar el stock del producto
       producto.stock -= prod.cantidad
       await producto.save({ session })
+
+      // Registrar el movimiento de inventario como "salida"
+      const detalleInventario = new DetalleInventarioSchema({
+        usuario_id: usuarioId,
+        producto_id: prod.productoId,
+        cantidad: prod.cantidad,
+        tipo_movimiento: 'salida',
+        venta_id: venta._id,
+        descripcion: "Venta de producto",
+      })
+
+      await detalleInventario.save({ session })
     }
 
     await session.commitTransaction()
@@ -71,6 +90,7 @@ export const crearVenta = async (req, res) => {
     res.status(404).json({ msg: error.message })
   }
 }
+
 
 export const obtenerVentas = async (req, res) => {
   const ventas = await VentaSchema.find()
