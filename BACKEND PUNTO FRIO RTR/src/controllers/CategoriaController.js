@@ -1,6 +1,4 @@
-import { subirImagen } from '../config/cloudinary.js'
 import CategoriaSchema from '../models/Categoria.js'
-import fs from 'fs-extra'
 import {
   validarActivado,
   validarCamposVacios,
