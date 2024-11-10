@@ -12,31 +12,13 @@ import {
 } from '../validators/ComunValidators.js'
 
 export const crearCategoria = async (req, res) => {
-  const imagenError = validarImagenRequerida(req.files)
-  if (imagenError) return res.status(400).json({ msg: imagenError.message })
-
   const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })
 
   const nombreError = await validarNombreUnico(req.body.nombre, 'categoria')
   if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
-  const imagenSubida = await subirImagen(
-    req.files.imagen.tempFilePath,
-    'categorias',
-  )
-
-  req.body.imagen = imagenSubida.secure_url
-
   const nuevaCategoria = new CategoriaSchema(req.body)
-
-  try {
-    await fs.unlink(req.files.imagen.tempFilePath)
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ msg: 'Error al borrar la imagen temporal', error })
-  }
 
   await nuevaCategoria.save()
 
@@ -91,21 +73,13 @@ export const actualizarCategoria = async (req, res) => {
   const nombreError = await validarNombreUnico(req.body.nombre, 'categoria')
   if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
-  if (req.files?.imagen) {
-    const imagenSubida = await subirImagen(
-      req.files.imagen.tempFilePath,
-      'categorias',
-    )
-    req.body.imagen = imagenSubida.secure_url
-    await fs.unlink(req.files.imagen.tempFilePath)
-  }
+  categoria.nombre = req.body.nombre
+  categoria.descripcion = req.body.descripcion
 
-  const categoriaActualizada = await CategoriaSchema.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-  )
+  await categoria.save()
 
-  res.status(200).json(categoriaActualizada)
+
+  res.status(200).json(categoria)
 }
 
 export const desactivarCategoria = async (req, res) => {
