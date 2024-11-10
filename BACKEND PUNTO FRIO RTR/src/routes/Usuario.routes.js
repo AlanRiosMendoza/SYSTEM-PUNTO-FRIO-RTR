@@ -33,8 +33,6 @@ router.put('/usuario/:id', verificarAdministrador, actualizarUsuario)
 
 router.post('/recuperar-password', recuperarPassword)
 
-router.post('/recuperar-password/:token', verificarToken)
-
 router.post('/nuevo-password/:token', nuevoPassword)
 
 router.get('/perfil', verificarAutenticacion, perfil)

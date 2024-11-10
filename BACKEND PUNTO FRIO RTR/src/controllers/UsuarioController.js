@@ -217,20 +217,6 @@ export const recuperarPassword = async (req, res) => {
   res.status(200).json({ msg: 'Correo enviado' })
 }
 
-export const verificarToken = async (req, res) => {
-  const usuario = await UsuarioSchema.findOne({ token: req.params.token })
-
-  const ExistenciaError = validarSiExisten(usuario, 'usuario')
-  if (ExistenciaError)
-    return res.status(404).json({ msg: ExistenciaError.message })
-
-  if (usuario.token !== req.params.token) {
-    return res.status(400).json({ msg: 'Token inválido' })
-  }
-
-  res.status(200).json({ msg: 'Token verificado' })
-}
-
 export const nuevoPassword = async (req, res) => {
   const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })
