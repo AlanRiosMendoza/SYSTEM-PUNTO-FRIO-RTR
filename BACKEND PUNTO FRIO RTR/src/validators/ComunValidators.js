@@ -171,7 +171,7 @@ export const validarCedulaUnica = async (schema, nombre) => {
     }
   }
   if (nombre === 'cliente') {
-    const clienteExistente = await ClienteSchema.findOne({ schema })
+    const clienteExistente = await ClienteSchema.findOne({ cedula:schema })
     if (clienteExistente) {
       return { error: true, message: 'Ya existe un cliente con esa cédula' }
     }
