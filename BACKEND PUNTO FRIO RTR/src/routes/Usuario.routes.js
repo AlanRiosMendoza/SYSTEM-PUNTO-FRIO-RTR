@@ -29,7 +29,7 @@ router.get('/usuarios', verificarAdministrador, obtenerUsuarios)
 
 router.get('/usuario/:id', verificarAdministrador, obtenerUsuario)
 
-router.put('/usuario/:id', verificarAutenticacion, actualizarUsuario)
+router.put('/usuario/:id', verificarAdministrador, actualizarUsuario)
 
 router.post('/recuperar-password', recuperarPassword)
 
