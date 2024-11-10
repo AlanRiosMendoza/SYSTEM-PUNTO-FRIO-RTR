@@ -40,6 +40,10 @@ export const obtenerClientes = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
+  const estado = req.query.estado
+  const nombre = req.query.nombre
+  const apellido = req.query.apellido
+
   const filtro = {}
 
   if (estado !== undefined) {
