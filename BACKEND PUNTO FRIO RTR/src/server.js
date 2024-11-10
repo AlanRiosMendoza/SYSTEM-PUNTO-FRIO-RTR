@@ -23,7 +23,7 @@ app.use(
 
 // Configuraciones
 app.set('port', process.env.PORT || 3000)
-app.use(cors())
+app.use(cors({ allowedHeaders: 'Content-Type, Authorization' }))
 
 // Middlewares
 app.use(express.json())
