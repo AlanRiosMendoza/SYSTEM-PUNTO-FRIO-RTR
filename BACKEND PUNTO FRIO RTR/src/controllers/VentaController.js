@@ -88,7 +88,12 @@ export const crearVenta = async (req, res) => {
 }
 
 export const obtenerVentas = async (req, res) => {
-  const ventas = await VentaSchema.find()
+  const pagina = parseInt(req.query.pagina) || 1
+  const limite = parseInt(req.query.limite) || 10
+  const skip = (pagina - 1) * limite
+
+  const ventas = await VentaSchema.find().skip(skip).limit(limite).lean()
+  
   res.status(200).json(ventas)
 }
 
