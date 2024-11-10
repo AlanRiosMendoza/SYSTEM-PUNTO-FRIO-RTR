@@ -75,7 +75,6 @@ export const actualizarCategoria = async (req, res) => {
 
   await categoria.save()
 
-
   res.status(200).json(categoria)
 }
 

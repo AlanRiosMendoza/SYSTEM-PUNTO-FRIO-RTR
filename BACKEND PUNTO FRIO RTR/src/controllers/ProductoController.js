@@ -40,10 +40,11 @@ export const crearProducto = async (req, res) => {
 export const obtenerProductos = async (req, res) => {
   const pagina = parseInt(req.query.pagina) || 1
   const limite = parseInt(req.query.limite) || 10
-
   const skip = (pagina - 1) * limite
 
-  const productos = await ProductoSchema.find({ activo: true })
+  const estado = req.query.estado || true
+
+  const productos = await ProductoSchema.find({ activo: estado })
     .skip(skip)
     .limit(limite)
 
@@ -140,21 +141,4 @@ export const activarProducto = async (req, res) => {
   await ProductoSchema.findByIdAndUpdate(req.params.id, { activo: true })
 
   res.status(200).json({ msg: 'Producto activado' })
-}
-
-export const obtenerProductosDesactivados = async (req, res) => {
-  const pagina = parseInt(req.query.pagina) || 1
-  const limite = parseInt(req.query.limite) || 10
-
-  const skip = (pagina - 1) * limite
-
-  const productos = await ProductoSchema.find({ activo: false })
-    .skip(skip)
-    .limit(limite)
-
-  const ExistenciaError = validarSiExisten(productos, 'productos')
-  if (ExistenciaError)
-    return res.status(404).json({ msg: ExistenciaError.message })
-
-  res.status(200).json(productos)
 }
