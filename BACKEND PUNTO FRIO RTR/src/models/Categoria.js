@@ -4,7 +4,6 @@ const categoriaSchema = new Schema(
   {
     nombre: { type: String, required: true, trim: true, unique: true },
     descripcion: { type: String, required: true, trim: true },
-    imagen: { type: String, trim: true },
     activo: { type: Boolean, default: true },
   },
   {
