@@ -59,7 +59,7 @@ export const actualizarCategoria = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const categoria = CategoriaSchema.findById(req.params.id)
+  const categoria = await CategoriaSchema.findById(req.params.id)
 
   const ExistenciaError = validarSiExisten(categoria, 'categorias')
   if (ExistenciaError)
