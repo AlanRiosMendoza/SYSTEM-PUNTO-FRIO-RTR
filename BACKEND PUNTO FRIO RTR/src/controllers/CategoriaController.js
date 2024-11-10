@@ -27,11 +27,20 @@ export const obtenerCategorias = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const estado = req.query.estado || true
+  const estado = req.query.estado
+  const nombre = req.query.nombre
 
-  const categorias = await CategoriaSchema.find({ activo: estado })
-    .skip(skip)
-    .limit(limite)
+  const filtro = {}
+
+  if (estado !== undefined) {
+    filtro.activo = estado
+  }
+
+  if (nombre) {
+    filtro.nombre = { $regex: nombre, $options: 'i' }
+  }
+
+  const categorias = await CategoriaSchema.find(filtro).skip(skip).limit(limite)
 
   const ExistenciaError = validarSiExisten(categorias, 'categorias')
   if (ExistenciaError)

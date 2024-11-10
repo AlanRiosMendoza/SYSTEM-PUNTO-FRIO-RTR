@@ -96,10 +96,14 @@ export const obtenerUsuarios = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const estado = req.query.estado || true
+  const estado = req.query.estado
   const nombre = req.query.nombre
 
-  const filtro = { activo: estado }
+  const filtro = {}
+
+  if (estado !== undefined) {
+    filtro.activo = estado
+  }
 
   if (nombre) {
     filtro.nombre = { $regex: nombre, $options: 'i' }
