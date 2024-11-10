@@ -45,7 +45,7 @@ export const obtenerClientes = async (req, res) => {
 
   const clientes = await ClienteSchema.find({
     activo: estado,
-    nombre: { $regex: nombre, $options: 'i' }
+    nombre: { $regex: nombre, $options: 'i' },
   })
     .skip(skip)
     .limit(limite)

@@ -47,12 +47,10 @@ export const obtenerProductos = async (req, res) => {
 
   const query = {
     activo: estado,
-    nombre: { $regex: nombre, $options: 'i' }
+    nombre: { $regex: nombre, $options: 'i' },
   }
 
-  const productos = await ProductoSchema.find(query)
-    .skip(skip)
-    .limit(limite)
+  const productos = await ProductoSchema.find(query).skip(skip).limit(limite)
 
   const ExistenciaError = validarSiExisten(productos, 'productos')
   if (ExistenciaError)
