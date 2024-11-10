@@ -5,7 +5,6 @@ import {
   validarActivado,
   validarCamposVacios,
   validarDesactivado,
-  validarImagenRequerida,
   validarNombreUnico,
   validarObjectId,
   validarSiExisten,
