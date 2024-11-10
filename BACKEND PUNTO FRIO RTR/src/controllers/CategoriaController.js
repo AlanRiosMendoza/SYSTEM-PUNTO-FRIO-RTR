@@ -40,10 +40,11 @@ export const crearCategoria = async (req, res) => {
 export const obtenerCategorias = async (req, res) => {
   const pagina = parseInt(req.query.pagina) || 1
   const limite = parseInt(req.query.limite) || 10
-
   const skip = (pagina - 1) * limite
 
-  const categorias = await CategoriaSchema.find({ activo: true })
+  const estado = req.query.estado || true
+
+  const categorias = await CategoriaSchema.find({ activo: estado })
     .skip(skip)
     .limit(limite)
 
@@ -141,23 +142,4 @@ export const activarCategoria = async (req, res) => {
   await CategoriaSchema.findByIdAndUpdate(req.params.id, { activo: true })
 
   res.status(200).json({ msg: 'Categoría activada' })
-}
-
-export const obtenerCategoriasDesactivadas = async (req, res) => {
-  const pagina = parseInt(req.query.pagina) || 1
-  const limite = parseInt(req.query.limite) || 10
-
-  const skip = (pagina - 1) * limite
-
-  const categorias = await CategoriaSchema.find({ activo: false })
-    .skip(skip)
-    .limit(limite)
-
-  const ExistenciaError = validarSiExisten(categorias, 'categorias')
-  if (ExistenciaError)
-    return res
-      .status(404)
-      .json({ msg: 'No se encontraron productos inactivos' })
-
-  res.status(200).json(categorias)
 }

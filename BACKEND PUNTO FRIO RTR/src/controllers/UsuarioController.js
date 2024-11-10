@@ -105,18 +105,14 @@ export const obtenerUsuarios = async (req, res) => {
     filtro.nombre = { $regex: nombre, $options: 'i' }
   }
 
-  try {
-    const usuarios = await UsuarioSchema.find(filtro).skip(skip).limit(limite)
+  const usuarios = await UsuarioSchema.find(filtro).skip(skip).limit(limite)
 
-    const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
-    if (ExistenciaError) {
-      return res.status(404).json({ msg: ExistenciaError.message })
-    }
-
-    res.status(200).json(usuarios)
-  } catch (error) {
-    res.status(500).json({ msg: 'Error al obtener usuarios', error })
+  const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
+  if (ExistenciaError) {
+    return res.status(404).json({ msg: ExistenciaError.message })
   }
+
+  res.status(200).json(usuarios)
 }
 
 export const obtenerUsuario = async (req, res) => {
@@ -150,7 +146,7 @@ export const actualizarUsuario = async (req, res) => {
   if (camposVaciosError)
     return res.status(400).json({ msg: camposVaciosError.message })
 
-  if(req.body.correo){
+  if (req.body.correo) {
     const correoError = validarCorreoElectronico(req.body.correo)
     if (correoError) return res.status(400).json({ msg: correoError.message })
 
@@ -160,7 +156,6 @@ export const actualizarUsuario = async (req, res) => {
     usuario.correo = req.body.correo
   }
 
-
   const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
   if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
 
@@ -169,7 +164,6 @@ export const actualizarUsuario = async (req, res) => {
 
   const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
   if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
-
 
   const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
   if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
@@ -191,7 +185,6 @@ export const actualizarUsuario = async (req, res) => {
   usuario.rol = req.body.rol
 
   await usuario.save()
-
 
   res.status(200).json(usuario)
 }
