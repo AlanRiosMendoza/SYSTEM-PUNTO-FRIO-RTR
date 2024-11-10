@@ -165,7 +165,7 @@ export const validarRol = (rol) => {
 
 export const validarCedulaUnica = async (schema, nombre) => {
   if (nombre === 'usuario') {
-    const usuarioExistente = await UsuarioSchema.findOne({ schema })
+    const usuarioExistente = await UsuarioSchema.findOne({ cedula:schema })
     if (usuarioExistente) {
       return { error: true, message: 'Ya existe un usuario con esa cédula' }
     }
