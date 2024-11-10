@@ -150,9 +150,6 @@ export const actualizarUsuario = async (req, res) => {
   if (camposVaciosError)
     return res.status(400).json({ msg: camposVaciosError.message })
 
-  const correoError = validarCorreoElectronico(req.body.correo)
-  if (correoError) return res.status(400).json({ msg: correoError.message })
-
   const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
   if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
 
@@ -161,10 +158,6 @@ export const actualizarUsuario = async (req, res) => {
 
   const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
   if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
-
-  const correoExistenteError = await validarCorreoExistente(req.body.correo)
-  if (correoExistenteError)
-    return res.status(400).json({ msg: correoExistenteError.message })
 
   const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
   if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
