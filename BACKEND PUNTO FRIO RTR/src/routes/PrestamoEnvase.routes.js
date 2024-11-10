@@ -15,6 +15,6 @@ router.get('/envases', verificarCajero, obtenerPrestamosEnvase)
 
 router.get('/envase/:id', verificarCajero, obtenerPrestamoEnvase)
 
-router.put('/envase/devolver/:id', verificarCajero, devolverPrestamoEnvase)
+router.put('/envase/:id', verificarCajero, devolverPrestamoEnvase)
 
 export default router

@@ -20,10 +20,12 @@ export const crearPrestamoEnvase = async (req, res) => {
 export const obtenerPrestamosEnvase = async (req, res) => {
   const pagina = parseInt(req.query.pagina) || 1
   const limite = parseInt(req.query.limite) || 10
-
   const skip = (pagina - 1) * limite
 
-  const prestamosEnvase = await PrestamoEnvaseSchema.find()
+  const estado = req.query.estado
+  const filtro = estado !== undefined ? { devuelto: estado } : {}
+
+  const prestamosEnvase = await PrestamoEnvaseSchema.find(filtro)
     .skip(skip)
     .limit(limite)
     .populate('cliente_id', 'nombre apellido')
