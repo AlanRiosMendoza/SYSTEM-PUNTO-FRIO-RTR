@@ -85,6 +85,11 @@ export const actualizarProducto = async (req, res) => {
   const nombreError = await validarNombreUnico(req.body.nombre, 'producto')
   if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
+  producto.nombre = req.body.nombre
+  producto.categoria_id = req.body.categoria_id
+  producto.precio = req.body.precio
+  producto.retornable = req.body.retornable
+
   if (req.files?.imagen) {
     const imagenSubida = await subirImagen(
       req.files.imagen.tempFilePath,
@@ -94,12 +99,9 @@ export const actualizarProducto = async (req, res) => {
     await fs.unlink(req.files.imagen.tempFilePath)
   }
 
-  const productoActualizado = await ProductoSchema.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-  )
-
-  res.status(200).json(productoActualizado)
+  await producto.save()
+  
+  res.status(200).json(producto)
 }
 
 export const desactivarProducto = async (req, res) => {
