@@ -30,7 +30,11 @@ export const crearCategoria = async (req, res) => {
 
   const nuevaCategoria = new CategoriaSchema(req.body)
 
-  await fs.unlink(req.files.imagen.tempFilePath)
+  try {
+    await fs.unlink(req.files.imagen.tempFilePath)
+  } catch (error) {
+    return res.status(500).json({ msg: 'Error al borrar la imagen temporal', error })
+  }
 
   await nuevaCategoria.save()
 
