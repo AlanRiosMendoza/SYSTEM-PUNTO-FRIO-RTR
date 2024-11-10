@@ -3,25 +3,30 @@ import VentaSchema from '../models/Venta.js'
 import DetalleVentaSchema from '../models/DetalleVenta.js'
 import ProductoSchema from '../models/Producto.js'
 import DetalleInventarioSchema from '../models/DetalleInventario.js'
+import {
+  validarObjectId,
+  validarSiExisten,
+} from '../validators/ComunValidators.js'
 
 export const crearVenta = async (req, res) => {
-  const { cedulaCliente, productos } = req.body
-  const { id: usuarioId } = req.UsuarioSchema
+  const { cliente_id, productos } = req.body
+  const { _id: usuario_id } = req.UsuarioSchema
 
   const session = await mongoose.startSession()
   session.startTransaction()
 
   try {
-    // Verificar disponibilidad de stock para cada producto
+    let total = 0
+
     for (const prod of productos) {
-      const producto = await ProductoSchema.findById(prod.productoId).session(
+      const producto = await ProductoSchema.findById(prod.producto_id).session(
         session,
       )
 
       if (!producto) {
         return res
           .status(404)
-          .json({ msg: `Producto con ID ${prod.productoId} no encontrado` })
+          .json({ msg: `Producto con ID ${prod.producto_id} no encontrado` })
       }
 
       if (producto.stock < prod.cantidad) {
@@ -29,48 +34,39 @@ export const crearVenta = async (req, res) => {
           msg: `Stock insuficiente para el producto ${producto.nombre}`,
         })
       }
+
+      total += prod.cantidad * producto.precio
     }
 
-    // Calcular el total de la venta
-    let total = 0
-    productos.forEach((prod) => {
-      total += prod.cantidad * prod.precioUnitario
-    })
-
-    // Crear la venta
     const venta = new VentaSchema({
-      cedulaCliente,
-      usuarioId,
+      cliente_id,
+      usuario_id,
       total,
     })
 
     await venta.save({ session })
 
-    // Procesar cada producto en la venta
     for (const prod of productos) {
-      const producto = await ProductoSchema.findById(prod.productoId).session(
+      const producto = await ProductoSchema.findById(prod.producto_id).session(
         session,
       )
 
-      // Crear el detalle de venta
       const detalleVenta = new DetalleVentaSchema({
-        ventaId: venta._id,
-        productoId: prod.productoId,
+        venta_id: venta._id,
+        producto_id: prod.producto_id,
         cantidad: prod.cantidad,
-        precioUnitario: prod.precioUnitario,
-        total: prod.cantidad * prod.precioUnitario,
+        precio_unitario: producto.precio,
+        total: prod.cantidad * producto.precio,
       })
 
       await detalleVenta.save({ session })
 
-      // Actualizar el stock del producto
       producto.stock -= prod.cantidad
       await producto.save({ session })
 
-      // Registrar el movimiento de inventario como "salida"
       const detalleInventario = new DetalleInventarioSchema({
-        usuario_id: usuarioId,
-        producto_id: prod.productoId,
+        usuario_id: usuario_id,
+        producto_id: prod.producto_id,
         cantidad: prod.cantidad,
         tipo_movimiento: 'salida',
         venta_id: venta._id,
@@ -101,8 +97,8 @@ export const obtenerVenta = async (req, res) => {
   if (idError) return res.status(400).json({ msg: idError.message })
 
   const venta = await VentaSchema.findById(req.params.id)
-    .populate('Usuario_id', 'nombre apellido')
-    .populate('cliente_cedula', 'nombre apellido')
+    .populate('usuario_id', 'nombre apellido')
+    .populate('cliente_id', 'nombre apellido')
     .lean()
 
   const ExistenciaError = validarSiExisten(venta, 'ventas')
@@ -112,8 +108,10 @@ export const obtenerVenta = async (req, res) => {
       .json({ msg: `Venta con ID ${req.params.id} no encontrada` })
 
   const detallesVenta = await DetalleVentaSchema.find({ venta_id: venta._id })
-    .populate('producto_id', 'nombre precio_unitario') // Poblar los productos
+    .populate('producto_id', 'nombre precio_unitario')
     .lean()
+
+  console.log(venta._id)
 
   venta.detalles = detallesVenta
 

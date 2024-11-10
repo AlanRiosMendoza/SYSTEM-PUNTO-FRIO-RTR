@@ -1,4 +1,15 @@
 import ClienteSchema from '../models/Cliente.js'
+import {
+  validarActivado,
+  validarCamposVacios,
+  validarCedulaUnica,
+  validarCorreoElectronico,
+  validarCorreoExistente,
+  validarDesactivado,
+  validarLongitudNumero,
+  validarObjectId,
+  validarSiExisten,
+} from '../validators/ComunValidators.js'
 
 export const crearCliente = async (req, res) => {
   const camposError = validarCamposVacios(req.body)
@@ -10,7 +21,7 @@ export const crearCliente = async (req, res) => {
   const correoError = validarCorreoElectronico(req.body.correo)
   if (correoError) return res.status(400).json({ msg: correoError.message })
 
-  const correoUnicoError = await validarCorreoUnico(req.body.correo)
+  const correoUnicoError = await validarCorreoExistente(req.body.correo)
   if (correoUnicoError)
     return res.status(400).json({ msg: correoUnicoError.message })
 
@@ -78,7 +89,7 @@ export const actualizarCliente = async (req, res) => {
   const correoError = validarCorreoElectronico(req.body.correo)
   if (correoError) return res.status(400).json({ msg: correoError.message })
 
-  const correoUnicoError = await validarCorreoUnico(req.body.correo)
+  const correoUnicoError = await validarCorreoExistente(req.body.correo)
   if (correoUnicoError)
     return res.status(400).json({ msg: correoUnicoError.message })
 

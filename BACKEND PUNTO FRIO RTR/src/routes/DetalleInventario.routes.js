@@ -1,8 +1,19 @@
 import { Router } from 'express'
-import { crearDetalleInventario } from '../controllers/DetalleInventarioController.js'
+import {
+  crearDetalleInventario,
+  obtenerDetalleInventario,
+  obtenerDetalleInventarioPorId,
+} from '../controllers/DetalleInventarioController.js'
+import { verificarAdministrador } from '../middlewares/autenticacion.js'
 
 const router = Router()
 
-router.get('/detalle-inventario', crearDetalleInventario)
+router.post('/inventario', verificarAdministrador, crearDetalleInventario)
+router.get('/inventarios', verificarAdministrador, obtenerDetalleInventario)
+router.get(
+  '/inventario/:id',
+  verificarAdministrador,
+  obtenerDetalleInventarioPorId,
+)
 
 export default router

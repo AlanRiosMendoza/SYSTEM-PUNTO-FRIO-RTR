@@ -8,15 +8,27 @@ import {
   activarCliente,
   obtenerClientesDesactivados,
 } from '../controllers/ClienteController.js'
+import {
+  verificarAutenticacion,
+  verificarCajero,
+} from '../middlewares/autenticacion.js'
 
 const router = Router()
 
-router.post('/cliente', crearCliente)
-router.get('/clientes', obtenerClientes)
-router.get('/cliente/:id', obtenerCliente)
-router.put('/cliente/:id', actualizarCliente)
-router.patch('/cliente/:id', desactivarCliente)
-router.patch('/cliente/activar/:id', activarCliente)
-router.get('/clientes/desactivados', obtenerClientesDesactivados)
+router.post('/cliente', verificarCajero, crearCliente)
+router.get('/clientes', verificarAutenticacion, obtenerClientes)
+router.get('/cliente/:id', verificarCajero, obtenerCliente)
+router.put('/cliente/:id', verificarCajero, actualizarCliente)
+router.patch(
+  '/cliente/desactivar/:id',
+  verificarAutenticacion,
+  desactivarCliente,
+)
+router.patch('/cliente/activar/:id', verificarAutenticacion, activarCliente)
+router.get(
+  '/clientes/desactivados',
+  verificarAutenticacion,
+  obtenerClientesDesactivados,
+)
 
 export default router

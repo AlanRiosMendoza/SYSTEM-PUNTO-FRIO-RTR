@@ -9,16 +9,12 @@ import {
 
 const router = Router()
 
-router.post('/prestamo-envase', verificarCajero, crearPrestamoEnvase)
+router.post('/envase', verificarCajero, crearPrestamoEnvase)
 
-router.get('/prestamos-envase', verificarCajero, obtenerPrestamosEnvase)
+router.get('/envases', verificarCajero, obtenerPrestamosEnvase)
 
-router.get('/prestamo-envase/:id', verificarCajero, obtenerPrestamoEnvase)
+router.get('/envase/:id', verificarCajero, obtenerPrestamoEnvase)
 
-router.put(
-  '/prestamo-envase/devolver/:id',
-  verificarCajero,
-  devolverPrestamoEnvase,
-)
+router.put('/envase/devolver/:id', verificarCajero, devolverPrestamoEnvase)
 
 export default router

@@ -21,19 +21,19 @@ export const validarObjectId = (id) => {
 
 export const validarNombreUnico = async (schema, nombre) => {
   if (nombre === 'categoria') {
-    const categoriaExistente = await CategoriaSchema.findOne({ schema })
+    const categoriaExistente = await CategoriaSchema.findOne({ nombre: schema })
     if (categoriaExistente) {
       return { error: true, message: `Ya existe una categoría con ese nombre` }
     }
   }
   if (nombre === 'producto') {
-    const productoExistente = await ProductoSchema.findOne({ schema })
+    const productoExistente = await ProductoSchema.findOne({ nombre: schema })
     if (productoExistente) {
       return { error: true, message: `Ya existe un producto con ese nombre` }
     }
   }
   if (nombre === 'usuario') {
-    const usuarioExistente = await UsuarioSchema.findOne({ schema })
+    const usuarioExistente = await UsuarioSchema.findOne({ nombre: schema })
     if (usuarioExistente) {
       return { error: true, message: `Ya existe un producto con ese nombre` }
     }

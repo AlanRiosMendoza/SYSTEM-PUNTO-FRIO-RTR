@@ -8,12 +8,15 @@ import {
   activarProducto,
   obtenerProductosDesactivados,
 } from '../controllers/ProductoController.js'
-import { verificarAdministrador } from '../middlewares/autenticacion.js'
+import {
+  verificarAdministrador,
+  verificarAutenticacion,
+} from '../middlewares/autenticacion.js'
 
 const router = Router()
 
 router.post('/producto', verificarAdministrador, crearProducto)
-router.get('/productos', obtenerProductos)
+router.get('/productos', verificarAutenticacion, obtenerProductos)
 router.get('/producto/:id', obtenerProducto)
 router.put('/producto/:id', verificarAdministrador, actualizarProducto)
 router.patch('/producto/:id', verificarAdministrador, desactivarProducto)

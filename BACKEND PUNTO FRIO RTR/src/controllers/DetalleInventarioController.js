@@ -1,10 +1,26 @@
 import DetalleInventarioSchema from '../models/DetalleInventario.js'
+import {
+  validarObjectId,
+  validarSiExisten,
+} from '../validators/ComunValidators.js'
+import ProductoSchema from '../models/Producto.js'
 
 export const crearDetalleInventario = async (req, res) => {
+  const { id: usuarioId } = req.UsuarioSchema
   const idError = validarObjectId(req.body.producto_id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
+  const producto = await ProductoSchema.findById(req.body.producto_id)
+
+  const ExistenciaError = validarSiExisten(producto, 'producto')
+  if (ExistenciaError)
+    return res.status(404).json({ msg: ExistenciaError.message })
+
+  producto.stock += parseInt(req.body.cantidad)
+  await producto.save()
+
   const nuevoDetalleInventario = new DetalleInventarioSchema(req.body)
+  nuevoDetalleInventario.usuario_id = usuarioId
   await nuevoDetalleInventario.save()
   res.status(201).json(nuevoDetalleInventario)
 }

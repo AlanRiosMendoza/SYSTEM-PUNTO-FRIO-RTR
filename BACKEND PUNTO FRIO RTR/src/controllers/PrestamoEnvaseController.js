@@ -1,12 +1,16 @@
 import PrestamoEnvaseSchema from '../models/PrestamoEnvase.js'
+import {
+  validarCamposVacios,
+  validarObjectId,
+  validarSiExisten,
+} from '../validators/ComunValidators.js'
 
 export const crearPrestamoEnvase = async (req, res) => {
   const clienteError = validarObjectId(req.body.cliente_id)
   if (clienteError) return res.status(400).json({ msg: clienteError.message })
 
-  const validarCamposVacios = validarCamposVacios(req.body)
-  if (validarCamposVacios)
-    return res.status(400).json({ msg: validarCamposVacios.message })
+  const camposError = validarCamposVacios(req.body)
+  if (camposError) return res.status(400).json({ msg: camposError.message })
 
   const prestamoEnvase = new PrestamoEnvaseSchema(req.body)
   await prestamoEnvase.save()

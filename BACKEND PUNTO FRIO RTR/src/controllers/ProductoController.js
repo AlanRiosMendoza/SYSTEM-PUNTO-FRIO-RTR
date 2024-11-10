@@ -22,20 +22,19 @@ export const crearProducto = async (req, res) => {
   const nombreError = await validarNombreUnico(req.body.nombre, 'producto')
   if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
-  const imagenSubida = await subirImagen(
-    req.files.imagen.tempFilePath,
-    'productos',
-  )
+  let imagenSubida
+  try {
+    imagenSubida = await subirImagen(req.files.imagen.tempFilePath, 'productos')
+    req.body.imagen = imagenSubida.secure_url
 
-  req.body.imagen = imagenSubida.secure_url
+    const nuevoProducto = new ProductoSchema(req.body)
+    await nuevoProducto.save()
 
-  const nuevoProducto = new ProductoSchema(req.body)
-
-  await fs.unlink(req.files.imagen.tempFilePath)
-
-  await nuevoProducto.save()
-
-  res.status(201).json(nuevoProducto)
+    res.status(201).json(nuevoProducto)
+  } finally {
+    console.log(req.files.imagen.tempFilePath)
+    await fs.unlink(req.files.imagen.tempFilePath)
+  }
 }
 
 export const obtenerProductos = async (req, res) => {
