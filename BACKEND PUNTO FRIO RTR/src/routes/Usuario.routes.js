@@ -6,7 +6,6 @@ import {
   obtenerUsuario,
   actualizarUsuario,
   recuperarPassword,
-  verificarToken,
   nuevoPassword,
   perfil,
   actualizarPassword,
