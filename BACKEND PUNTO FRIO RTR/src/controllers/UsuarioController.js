@@ -94,18 +94,29 @@ export const login = async (req, res) => {
 export const obtenerUsuarios = async (req, res) => {
   const pagina = parseInt(req.query.pagina) || 1
   const limite = parseInt(req.query.limite) || 10
-
   const skip = (pagina - 1) * limite
 
-  const usuarios = await UsuarioSchema.find({ activo: true })
-    .skip(skip)
-    .limit(limite)
+  const estado = req.query.estado || true
+  const nombre = req.query.nombre
 
-  const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
-  if (ExistenciaError)
-    return res.status(404).json({ msg: ExistenciaError.message })
+  const filtro = { activo: estado }
 
-  res.status(200).json(usuarios)
+  if (nombre) {
+    filtro.nombre = { $regex: nombre, $options: 'i' }
+  }
+
+  try {
+    const usuarios = await UsuarioSchema.find(filtro).skip(skip).limit(limite)
+
+    const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
+    if (ExistenciaError) {
+      return res.status(404).json({ msg: ExistenciaError.message })
+    }
+
+    res.status(200).json(usuarios)
+  } catch (error) {
+    res.status(500).json({ msg: 'Error al obtener usuarios', error })
+  }
 }
 
 export const obtenerUsuario = async (req, res) => {
@@ -321,23 +332,4 @@ export const activarUsuario = async (req, res) => {
   await UsuarioSchema.findByIdAndUpdate(req.params.id, { activo: true })
 
   res.status(200).json({ msg: 'Usuario activado' })
-}
-
-export const obtenerUsuariosDesactivados = async (req, res) => {
-  const pagina = parseInt(req.query.pagina) || 1
-  const limite = parseInt(req.query.limite) || 10
-
-  const skip = (pagina - 1) * limite
-
-  const usuarios = await UsuarioSchema.find({ activo: false })
-    .skip(skip)
-    .limit(limite)
-
-  const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
-  if (ExistenciaError)
-    return res.status(404).json({
-      msg: 'No se encontraron usuarios desactivados',
-    })
-
-  res.status(200).json(usuarios)
 }
