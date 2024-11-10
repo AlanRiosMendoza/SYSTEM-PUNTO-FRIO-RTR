@@ -1,5 +1,8 @@
 import { Router } from 'express'
-import { verificarAutenticacion, verificarCajero } from '../middlewares/autenticacion.js'
+import {
+  verificarAutenticacion,
+  verificarCajero,
+} from '../middlewares/autenticacion.js'
 import {
   crearPrestamoEnvase,
   obtenerPrestamosEnvase,
