@@ -157,6 +157,7 @@ export const actualizarUsuario = async (req, res) => {
     const correoExistenteError = await validarCorreoExistente(req.body.correo)
     if (correoExistenteError)
       return res.status(400).json({ msg: correoExistenteError.message })
+    usuario.correo = req.body.correo
   }
 
 
@@ -176,12 +177,23 @@ export const actualizarUsuario = async (req, res) => {
   const rolError = validarRol(req.body.rol)
   if (rolError) return res.status(400).json({ msg: rolError.message })
 
-  const usuarioActualizado = await UsuarioSchema.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-  )
+  // const usuarioActualizado = await UsuarioSchema.findByIdAndUpdate(
+  //   req.params.id,
+  //   req.body,
+  // )
 
-  res.status(200).json(usuarioActualizado)
+  // console.log(usuarioActualizado)
+
+  usuario.nombre = req.body.nombre
+  usuario.apellido = req.body.apellido
+  usuario.cedula = req.body.cedula
+  usuario.telefono = req.body.telefono
+  usuario.rol = req.body.rol
+
+  await usuario.save()
+
+
+  res.status(200).json(usuario)
 }
 
 export const recuperarPassword = async (req, res) => {
