@@ -40,15 +40,21 @@ export const obtenerClientes = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const estado = req.query.estado || true
-  const nombre = req.query.nombre || ''
+  const filtro = {}
 
-  const clientes = await ClienteSchema.find({
-    activo: estado,
-    nombre: { $regex: nombre, $options: 'i' },
-  })
-    .skip(skip)
-    .limit(limite)
+  if (estado !== undefined) {
+    filtro.activo = estado
+  }
+
+  if (nombre) {
+    filtro.nombre = { $regex: nombre, $options: 'i' }
+  }
+
+  if (apellido) {
+    filtro.apellido = { $regex: apellido, $options: 'i' }
+  }
+
+  const clientes = await ClienteSchema.find(filtro).skip(skip).limit(limite)
 
   const ExistenciaError = validarSiExisten(clientes, 'clientes')
   if (ExistenciaError)

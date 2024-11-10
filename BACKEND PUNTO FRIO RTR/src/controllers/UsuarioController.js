@@ -98,6 +98,7 @@ export const obtenerUsuarios = async (req, res) => {
 
   const estado = req.query.estado
   const nombre = req.query.nombre
+  const apellido = req.query.apellido
 
   const filtro = {}
 
@@ -107,6 +108,10 @@ export const obtenerUsuarios = async (req, res) => {
 
   if (nombre) {
     filtro.nombre = { $regex: nombre, $options: 'i' }
+  }
+
+  if (apellido) {
+    filtro.apellido = { $regex: apellido, $options: 'i' }
   }
 
   const usuarios = await UsuarioSchema.find(filtro).skip(skip).limit(limite)
