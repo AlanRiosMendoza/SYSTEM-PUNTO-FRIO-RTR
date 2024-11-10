@@ -6,7 +6,6 @@ import {
   actualizarCliente,
   desactivarCliente,
   activarCliente,
-  obtenerClientesDesactivados,
 } from '../controllers/ClienteController.js'
 import {
   verificarAutenticacion,
@@ -17,18 +16,9 @@ const router = Router()
 
 router.post('/cliente', verificarCajero, crearCliente)
 router.get('/clientes', verificarAutenticacion, obtenerClientes)
-router.get('/cliente/:id', verificarCajero, obtenerCliente)
+router.get('/cliente/:id', verificarAutenticacion, obtenerCliente)
 router.put('/cliente/:id', verificarCajero, actualizarCliente)
-router.patch(
-  '/cliente/desactivar/:id',
-  verificarAutenticacion,
-  desactivarCliente,
-)
-router.patch('/cliente/activar/:id', verificarAutenticacion, activarCliente)
-router.get(
-  '/clientes/desactivados',
-  verificarAutenticacion,
-  obtenerClientesDesactivados,
-)
+router.patch('/cliente/:id', verificarCajero, desactivarCliente)
+router.patch('/cliente/activar/:id', verificarCajero, activarCliente)
 
 export default router

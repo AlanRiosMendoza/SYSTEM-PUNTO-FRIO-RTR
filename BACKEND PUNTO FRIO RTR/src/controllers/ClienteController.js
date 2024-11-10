@@ -38,10 +38,11 @@ export const crearCliente = async (req, res) => {
 export const obtenerClientes = async (req, res) => {
   const pagina = parseInt(req.query.pagina) || 1
   const limite = parseInt(req.query.limite) || 10
-
   const skip = (pagina - 1) * limite
 
-  const clientes = await ClienteSchema.find({ activo: true })
+  const estado = req.query.estado || true
+
+  const clientes = await ClienteSchema.find({ activo: estado })
     .skip(skip)
     .limit(limite)
 
@@ -96,9 +97,16 @@ export const actualizarCliente = async (req, res) => {
   const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'telefono')
   if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
 
-  await ClienteSchema.findByIdAndUpdate(req.params.id, req.body)
+  cliente.cedula = req.body.cedula
+  cliente.nombre = req.body.nombre
+  cliente.apellido = req.body.apellido
+  cliente.correo = req.body.correo
+  cliente.telefono = req.body.telefono
+  cliente.direccion = req.body.direccion
 
-  res.status(200).json({ msg: 'Cliente actualizado correctamente' })
+  await cliente.save()
+
+  res.status(200).json({ cliente })
 }
 
 export const desactivarCliente = async (req, res) => {
@@ -140,21 +148,4 @@ export const activarCliente = async (req, res) => {
   await ClienteSchema.findByIdAndUpdate(req.params.id, { activo: true })
 
   res.status(200).json({ msg: 'Cliente activado correctamente' })
-}
-
-export const obtenerClientesDesactivados = async (req, res) => {
-  const pagina = parseInt(req.query.pagina) || 1
-  const limite = parseInt(req.query.limite) || 10
-
-  const skip = (pagina - 1) * limite
-
-  const clientes = await ClienteSchema.find({ activo: false })
-    .skip(skip)
-    .limit(limite)
-
-  const ExistenciaError = validarSiExisten(clientes, 'clientes')
-  if (ExistenciaError)
-    return res.status(404).json({ msg: ExistenciaError.message })
-
-  res.json(clientes)
 }

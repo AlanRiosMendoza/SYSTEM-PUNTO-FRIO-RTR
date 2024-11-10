@@ -100,7 +100,7 @@ export const actualizarProducto = async (req, res) => {
   }
 
   await producto.save()
-  
+
   res.status(200).json(producto)
 }
 
