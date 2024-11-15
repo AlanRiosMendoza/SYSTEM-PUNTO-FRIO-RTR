@@ -23,8 +23,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
-    "nodemailer": "^6.9.15",
-    "socket.io": "^4.8.1"
+    "nodemailer": "^6.9.15"
   },
   "devDependencies": {
     "standard": "^17.1.2"
