@@ -9,7 +9,7 @@ const detalleInventarioSchema = new Schema({
   tipo_movimiento: {
     type: String,
     required: true,
-    enum: ['entrada', 'salida'],
+    enum: ['Entrada', 'Salida'],
   },
   venta_id: { type: Schema.Types.ObjectId, ref: 'Venta' },
 })
