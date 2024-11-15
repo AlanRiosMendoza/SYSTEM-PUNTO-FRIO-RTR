@@ -21,8 +21,10 @@ export const crearDetalleInventario = async (req, res) => {
 
   const nuevoDetalleInventario = new DetalleInventarioSchema(req.body)
   nuevoDetalleInventario.usuario_id = usuarioId
+  nuevoDetalleInventario.tipo_movimiento = 'Entrada'
   await nuevoDetalleInventario.save()
-  res.status(201).json(nuevoDetalleInventario)
+
+  res.status(201).json({ msg: 'Detalle de inventario creado' })
 }
 
 export const obtenerDetalleInventario = async (req, res) => {
@@ -32,8 +34,12 @@ export const obtenerDetalleInventario = async (req, res) => {
   const skip = (pagina - 1) * limite
 
   const detalleInventario = await DetalleInventarioSchema.find()
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limite)
+    .select('_id cantidad fecha descripcion tipo_movimiento')
+    .populate('usuario_id', 'nombre apellido')
+    .populate('producto_id', 'nombre stock')
 
   const ExistenciaError = validarSiExisten(
     detalleInventario,
@@ -52,6 +58,9 @@ export const obtenerDetalleInventarioPorId = async (req, res) => {
   const detalleInventario = await DetalleInventarioSchema.findById(
     req.params.id,
   )
+    .select('_id cantidad fecha descripcion tipo_movimiento')
+    .populate('usuario_id', 'nombre apellido')
+    .populate('producto_id', 'nombre stock')
 
   const ExistenciaError = validarSiExisten(
     detalleInventario,
