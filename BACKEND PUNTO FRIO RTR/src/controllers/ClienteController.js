@@ -32,7 +32,7 @@ export const crearCliente = async (req, res) => {
 
   nuevoCliente.save()
 
-  res.status(201).json({ nuevoCliente })
+  res.status(201).json({ msg: 'Cliente creado' })
 }
 
 export const obtenerClientes = async (req, res) => {
@@ -40,25 +40,18 @@ export const obtenerClientes = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const estado = req.query.estado
-  const nombre = req.query.nombre
-  const apellido = req.query.apellido
+  const cedula = req.query.cedula
 
   const filtro = {}
 
-  if (estado !== undefined) {
-    filtro.activo = estado
+  if (cedula) {
+    filtro.cedula = { $regex: cedula, $options: 'i' }
   }
 
-  if (nombre) {
-    filtro.nombre = { $regex: nombre, $options: 'i' }
-  }
-
-  if (apellido) {
-    filtro.apellido = { $regex: apellido, $options: 'i' }
-  }
-
-  const clientes = await ClienteSchema.find(filtro).skip(skip).limit(limite)
+  const clientes = await ClienteSchema.find(filtro)
+    .skip(skip)
+    .limit(limite)
+    .select('_id cedula nombre apellido correo telefono direccion')
 
   const ExistenciaError = validarSiExisten(clientes, 'clientes')
   if (ExistenciaError)
@@ -71,7 +64,9 @@ export const obtenerCliente = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const cliente = await ClienteSchema.findById(req.params.id)
+  const cliente = await ClienteSchema.findById(req.params.id).select(
+    '_id cedula nombre apellido correo telefono direccion',
+  )
 
   const ExistenciaError = validarSiExisten(cliente, 'cliente')
   if (ExistenciaError)
@@ -94,6 +89,17 @@ export const actualizarCliente = async (req, res) => {
       .status(404)
       .json({ msg: `No se encontró un cliente con el ID: ${req.params.id}` })
 
+  if (req.body.correo) {
+    const correoError = validarCorreoElectronico(req.body.correo)
+    if (correoError) return res.status(400).json({ msg: correoError.message })
+
+    const correoUnicoError = await validarCorreoExistente(req.body.correo)
+    if (correoUnicoError)
+      return res.status(400).json({ msg: correoUnicoError.message })
+
+    cliente.correo = req.body.correo
+  }
+
   const camposVaciosError = validarCamposVacios(req.body)
   if (camposVaciosError)
     return res.status(400).json({ msg: camposVaciosError.message })
@@ -101,65 +107,16 @@ export const actualizarCliente = async (req, res) => {
   const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
   if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
 
-  const correoError = validarCorreoElectronico(req.body.correo)
-  if (correoError) return res.status(400).json({ msg: correoError.message })
-
-  const correoUnicoError = await validarCorreoExistente(req.body.correo)
-  if (correoUnicoError)
-    return res.status(400).json({ msg: correoUnicoError.message })
-
   const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'telefono')
   if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
 
   cliente.cedula = req.body.cedula
   cliente.nombre = req.body.nombre
   cliente.apellido = req.body.apellido
-  cliente.correo = req.body.correo
   cliente.telefono = req.body.telefono
   cliente.direccion = req.body.direccion
 
   await cliente.save()
 
-  res.status(200).json({ cliente })
-}
-
-export const desactivarCliente = async (req, res) => {
-  const idError = validarObjectId(req.params.id)
-  if (idError) return res.status(400).json({ msg: idError.message })
-
-  const cliente = await ClienteSchema.findById(req.params.id)
-
-  const ExistenciaError = validarSiExisten(cliente, 'cliente')
-  if (ExistenciaError)
-    return res
-      .status(404)
-      .json({ msg: `No se encontró el cliente con ese ID: ${req.params.id}` })
-
-  const desactivadoError = validarDesactivado(cliente, 'cliente')
-  if (desactivadoError)
-    return res.status(400).json({ msg: desactivadoError.message })
-
-  await ClienteSchema.findByIdAndUpdate(req.params.id, { activo: false })
-
-  res.status(200).json({ msg: 'Cliente desactivado correctamente' })
-}
-
-export const activarCliente = async (req, res) => {
-  const idError = validarObjectId(req.params.id)
-  if (idError) return res.status(400).json({ msg: idError.message })
-
-  const cliente = await ClienteSchema.findById(req.params.id)
-
-  const ExistenciaError = validarSiExisten(cliente, 'cliente')
-  if (ExistenciaError)
-    return res
-      .status(404)
-      .json({ msg: `No se encontró el cliente con ese ID: ${req.params.id}` })
-
-  const activadoError = validarActivado(cliente, 'cliente')
-  if (activadoError) return res.status(400).json({ msg: activadoError.message })
-
-  await ClienteSchema.findByIdAndUpdate(req.params.id, { activo: true })
-
-  res.status(200).json({ msg: 'Cliente activado correctamente' })
+  res.status(200).json({ msg: 'Cliente actualizado' })
 }
