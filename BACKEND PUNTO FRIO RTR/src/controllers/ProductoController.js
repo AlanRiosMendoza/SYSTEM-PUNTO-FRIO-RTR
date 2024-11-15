@@ -30,9 +30,8 @@ export const crearProducto = async (req, res) => {
     const nuevoProducto = new ProductoSchema(req.body)
     await nuevoProducto.save()
 
-    res.status(201).json(nuevoProducto)
+    res.status(201).json({ msg: 'Producto creado' })
   } finally {
-    console.log(req.files.imagen.tempFilePath)
     await fs.unlink(req.files.imagen.tempFilePath)
   }
 }
@@ -55,7 +54,11 @@ export const obtenerProductos = async (req, res) => {
     filtro.nombre = { $regex: nombre, $options: 'i' }
   }
 
-  const productos = await ProductoSchema.find(filtro).skip(skip).limit(limite)
+  const productos = await ProductoSchema.find(filtro)
+    .skip(skip)
+    .limit(limite)
+    .select('_id nombre descripcion precio imagen retornable')
+    .populate('categoria_id', 'nombre')
 
   const ExistenciaError = validarSiExisten(productos, 'productos')
   if (ExistenciaError)
@@ -69,6 +72,8 @@ export const obtenerProducto = async (req, res) => {
   if (idError) return res.status(400).json({ msg: idError.message })
 
   const producto = await ProductoSchema.findById(req.params.id)
+    .select('_id nombre descripcion precio imagen retornable')
+    .populate('categoria_id', 'nombre')
 
   const ExistenciaError = validarSiExisten(producto, 'productos')
   if (ExistenciaError)
@@ -110,7 +115,7 @@ export const actualizarProducto = async (req, res) => {
 
   await producto.save()
 
-  res.status(200).json(producto)
+  res.status(200).json({ msg: 'Producto actualizado' })
 }
 
 export const desactivarProducto = async (req, res) => {
