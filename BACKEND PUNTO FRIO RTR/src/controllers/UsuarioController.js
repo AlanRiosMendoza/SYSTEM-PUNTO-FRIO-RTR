@@ -55,7 +55,7 @@ export const registro = async (req, res) => {
 
   await nuevoUsuario.save()
 
-  res.status(201).json({ nuevoUsuario })
+  res.status(201).json({ msg: 'Usuario creado' })
 }
 
 export const login = async (req, res) => {
@@ -85,9 +85,11 @@ export const login = async (req, res) => {
   usuario.fechaUltimoAcceso = new Date()
   await usuario.save()
 
+  const { _id, nombre, apellido, rol } = usuario
+
   res.status(200).json({
     token,
-    usuario,
+    usuario: { _id, nombre, apellido, correo, rol },
   })
 }
 
@@ -97,8 +99,6 @@ export const obtenerUsuarios = async (req, res) => {
   const skip = (pagina - 1) * limite
 
   const estado = req.query.estado
-  const nombre = req.query.nombre
-  const apellido = req.query.apellido
 
   const filtro = {}
 
@@ -106,15 +106,14 @@ export const obtenerUsuarios = async (req, res) => {
     filtro.activo = estado
   }
 
-  if (nombre) {
-    filtro.nombre = { $regex: nombre, $options: 'i' }
+  if (cedula) {
+    filtro.cedula = { $regex: cedula, $options: 'i' }
   }
 
-  if (apellido) {
-    filtro.apellido = { $regex: apellido, $options: 'i' }
-  }
-
-  const usuarios = await UsuarioSchema.find(filtro).skip(skip).limit(limite)
+  const usuarios = await UsuarioSchema.find(filtro)
+    .skip(skip)
+    .limit(limite)
+    .select('_id cedula nombre apellido rol correo telefono activo')
 
   const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
   if (ExistenciaError) {
@@ -128,7 +127,9 @@ export const obtenerUsuario = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const usuario = await UsuarioSchema.findById(req.params.id)
+  const usuario = await UsuarioSchema.findById(req.params.id).select(
+    '_id nombre apellido rol correo cedula telefono activo',
+  )
 
   const ExistenciaError = validarSiExisten(usuario, 'usuario')
   if (ExistenciaError)
@@ -177,25 +178,14 @@ export const actualizarUsuario = async (req, res) => {
   const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
   if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
 
-  const rolError = validarRol(req.body.rol)
-  if (rolError) return res.status(400).json({ msg: rolError.message })
-
-  // const usuarioActualizado = await UsuarioSchema.findByIdAndUpdate(
-  //   req.params.id,
-  //   req.body,
-  // )
-
-  // console.log(usuarioActualizado)
-
   usuario.nombre = req.body.nombre
   usuario.apellido = req.body.apellido
-  usuario.cedula = req.body.cedula
   usuario.telefono = req.body.telefono
-  usuario.rol = req.body.rol
+  usuario.cedula = req.body.cedula
 
   await usuario.save()
 
-  res.status(200).json(usuario)
+  res.status(200).json({ msg: 'Usuario actualizado' })
 }
 
 export const recuperarPassword = async (req, res) => {
@@ -294,7 +284,7 @@ export const cambiarRole = async (req, res) => {
 
   await usuario.save()
 
-  res.status(200).json({ usuario })
+  res.status(200).json({ msg: 'Rol actualizado' })
 }
 
 export const desactivarUsuario = async (req, res) => {
