@@ -99,6 +99,7 @@ export const obtenerUsuarios = async (req, res) => {
   const skip = (pagina - 1) * limite
 
   const estado = req.query.estado
+  const cedula = req.query.cedula
 
   const filtro = {}
 
