@@ -68,7 +68,7 @@ export const crearVenta = async (req, res) => {
         usuario_id: usuario_id,
         producto_id: prod.producto_id,
         cantidad: prod.cantidad,
-        tipo_movimiento: 'salida',
+        tipo_movimiento: 'Salida',
         venta_id: venta._id,
         descripcion: 'Venta de producto',
       })
@@ -92,8 +92,14 @@ export const obtenerVentas = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const ventas = await VentaSchema.find().skip(skip).limit(limite).lean()
-  
+  const ventas = await VentaSchema.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limite)
+    .populate('usuario_id', 'nombre apellido')
+    .populate('cliente_id', 'nombre apellido')
+    .select('_id total fecha')
+
   res.status(200).json(ventas)
 }
 
@@ -104,7 +110,7 @@ export const obtenerVenta = async (req, res) => {
   const venta = await VentaSchema.findById(req.params.id)
     .populate('usuario_id', 'nombre apellido')
     .populate('cliente_id', 'nombre apellido')
-    .lean()
+    .select('_id total fecha')
 
   const ExistenciaError = validarSiExisten(venta, 'ventas')
   if (ExistenciaError)
