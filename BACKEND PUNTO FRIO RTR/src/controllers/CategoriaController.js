@@ -19,7 +19,7 @@ export const crearCategoria = async (req, res) => {
 
   await nuevaCategoria.save()
 
-  res.status(201).json(nuevaCategoria)
+  res.status(201).json({ msg: 'Categoría creada' })
 }
 
 export const obtenerCategorias = async (req, res) => {
@@ -40,7 +40,10 @@ export const obtenerCategorias = async (req, res) => {
     filtro.nombre = { $regex: nombre, $options: 'i' }
   }
 
-  const categorias = await CategoriaSchema.find(filtro).skip(skip).limit(limite)
+  const categorias = await CategoriaSchema.find(filtro)
+    .skip(skip)
+    .limit(limite)
+    .select('_id nombre descripcion activo')
 
   const ExistenciaError = validarSiExisten(categorias, 'categorias')
   if (ExistenciaError)
@@ -53,7 +56,9 @@ export const obtenerCategoria = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const categoria = await CategoriaSchema.findById(req.params.id)
+  const categoria = await CategoriaSchema.findById(req.params.id).select(
+    '_id nombre descripcion activo',
+  )
 
   const ExistenciaError = validarSiExisten(categoria, 'categorias')
   if (ExistenciaError)
@@ -84,7 +89,7 @@ export const actualizarCategoria = async (req, res) => {
 
   await categoria.save()
 
-  res.status(200).json(categoria)
+  res.status(200).json({ msg: 'Categoría actualizada' })
 }
 
 export const desactivarCategoria = async (req, res) => {
