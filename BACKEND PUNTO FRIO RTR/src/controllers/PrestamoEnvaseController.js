@@ -26,6 +26,7 @@ export const obtenerPrestamosEnvase = async (req, res) => {
   const filtro = estado !== undefined ? { devuelto: estado } : {}
 
   const prestamosEnvase = await PrestamoEnvaseSchema.find(filtro)
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limite)
     .populate('cliente_id', 'nombre apellido')
@@ -44,9 +45,9 @@ export const obtenerPrestamoEnvase = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const prestamoEnvase = await PrestamoEnvaseSchema.findById(
-    req.params.id,
-  ).populate('cliente_id', 'nombre apellido')
+  const prestamoEnvase = await PrestamoEnvaseSchema.findById(req.params.id)
+    .populate('cliente_id', 'nombre apellido')
+    .select('_id prestamo deposito fecha_devuelto devuelto fecha_prestamo')
 
   const ExistenciaError = validarSiExisten(
     prestamoEnvase,
@@ -63,6 +64,8 @@ export const devolverPrestamoEnvase = async (req, res) => {
   if (idError) return res.status(400).json({ msg: idError.message })
 
   const prestamoEnvase = await PrestamoEnvaseSchema.findById(req.params.id)
+    .populate('cliente_id', 'nombre apellido')
+    .select('_id prestamo deposito fecha_devuelto devuelto fecha_prestamo')
 
   const ExistenciaError = validarSiExisten(
     prestamoEnvase,
