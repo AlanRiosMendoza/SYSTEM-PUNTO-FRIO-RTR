@@ -42,15 +42,20 @@ export const obtenerProductos = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const estado = req.query.estado !== undefined ? req.query.estado : true
-  const nombre = req.query.nombre || ''
+  const estado = req.query.estado
+  const nombre = req.query.nombre
 
-  const query = {
-    activo: estado,
-    nombre: { $regex: nombre, $options: 'i' },
+  const filtro = {}
+
+  if (estado !== undefined) {
+    filtro.activo = estado
   }
 
-  const productos = await ProductoSchema.find(query).skip(skip).limit(limite)
+  if (nombre) {
+    filtro.nombre = { $regex: nombre, $options: 'i' }
+  }
+
+  const productos = await ProductoSchema.find(filtro).skip(skip).limit(limite)
 
   const ExistenciaError = validarSiExisten(productos, 'productos')
   if (ExistenciaError)
