@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 
 const usuarioSchema = new Schema(
   {
-    cedula: { type: String, required: true, trim: true },
+    cedula: { type: String, required: true, trim: true, index: true },
     nombre: { type: String, required: true, trim: true },
     apellido: { type: String, required: true, trim: true },
     telefono: { type: String, default: null, trim: true },
