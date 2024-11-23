@@ -1,9 +1,6 @@
 import ProductoSchema from '../models/Producto.js'
-import { subirImagen } from '../config/cloudinary.js'
-import fs from 'fs-extra'
 
 import {
-  validarImagenRequerida,
   validarObjectId,
   validarNombreUnico,
   validarSiExisten,
@@ -13,27 +10,17 @@ import {
 } from '../validators/ComunValidators.js'
 
 export const crearProducto = async (req, res) => {
-  const imagenError = validarImagenRequerida(req.files)
-  if (imagenError) return res.status(400).json({ msg: imagenError.message })
-
+  console.log(req.body)
   const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })
 
   const nombreError = await validarNombreUnico(req.body.nombre, 'producto')
   if (nombreError) return res.status(400).json({ msg: nombreError.message })
 
-  let imagenSubida
-  try {
-    imagenSubida = await subirImagen(req.files.imagen.tempFilePath, 'productos')
-    req.body.imagen = imagenSubida.secure_url
+  const nuevoProducto = new ProductoSchema(req.body)
+  await nuevoProducto.save()
 
-    const nuevoProducto = new ProductoSchema(req.body)
-    await nuevoProducto.save()
-
-    res.status(201).json({ msg: 'Producto creado' })
-  } finally {
-    await fs.unlink(req.files.imagen.tempFilePath)
-  }
+  res.status(201).json({ msg: 'Producto creado' })
 }
 
 export const obtenerProductos = async (req, res) => {
@@ -103,15 +90,6 @@ export const actualizarProducto = async (req, res) => {
   producto.categoria_id = req.body.categoria_id
   producto.precio = req.body.precio
   producto.retornable = req.body.retornable
-
-  if (req.files?.imagen) {
-    const imagenSubida = await subirImagen(
-      req.files.imagen.tempFilePath,
-      'productos',
-    )
-    req.body.imagen = imagenSubida.secure_url
-    await fs.unlink(req.files.imagen.tempFilePath)
-  }
 
   await producto.save()
 

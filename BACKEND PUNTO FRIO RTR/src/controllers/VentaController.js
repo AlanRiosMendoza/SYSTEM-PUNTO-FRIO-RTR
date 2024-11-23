@@ -92,7 +92,18 @@ export const obtenerVentas = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const ventas = await VentaSchema.find()
+  const { fechaInicio, fechaFin } = req.query
+
+  if (fechaInicio && fechaFin) {
+    const filtro = {
+      fecha: {
+        $gte: new Date(fechaInicio),
+        $lte: new Date(fechaFin),
+      },
+    }
+  }
+
+  const ventas = await VentaSchema.find(filtro)
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limite)

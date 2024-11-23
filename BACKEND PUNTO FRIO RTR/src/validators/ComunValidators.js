@@ -5,13 +5,6 @@ import ProductoSchema from '../models/Producto.js'
 import UsuarioSchema from '../models/Usuario.js'
 import ClienteSchema from '../models/Cliente.js'
 
-export const validarImagenRequerida = (files) => {
-  if (!files?.imagen) {
-    return { error: true, message: 'Se requiere una imagen' }
-  }
-  return null
-}
-
 export const validarObjectId = (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return { error: true, message: `ID no válido: ${id}` }

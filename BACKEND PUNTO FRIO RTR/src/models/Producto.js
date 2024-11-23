@@ -7,7 +7,6 @@ const productoSchema = new Schema(
     precio: { type: Number, required: true },
     stock: { type: Number, default: 0 },
     retornable: { type: Boolean, required: true },
-    imagen: { type: String, required: true, trim: true },
     activo: { type: Boolean, trim: true, default: true },
   },
   {

@@ -1,8 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
-import fileUpload from 'express-fileupload'
-
 import routerUsuario from './routes/Usuario.routes.js'
 import routerCategoria from './routes/Categoria.routes.js'
 import routerProducto from './routes/Producto.routes.js'
@@ -14,19 +12,13 @@ import routerDetalleInventario from './routes/DetalleInventario.routes.js'
 const app = express()
 dotenv.config()
 
-app.use(
-  fileUpload({
-    useTempFiles: true,
-    tempFileDir: './uploads',
-  }),
-)
-
 // Configuraciones
 app.set('port', process.env.PORT || 3000)
 app.use(cors({ allowedHeaders: 'Content-Type, Authorization' }))
 
 // Middlewares
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
 // Rutas
 app.get('/', (req, res) => res.send('Servidor de Punto Frio RTR'))

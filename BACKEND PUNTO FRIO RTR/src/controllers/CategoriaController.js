@@ -95,7 +95,6 @@ export const actualizarCategoria = async (req, res) => {
 export const desactivarCategoria = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
-  console.log(req.params.id)
   const categoria = await CategoriaSchema.findById(req.params.id)
 
   const ExistenciaError = validarSiExisten(categoria, 'categorias')
@@ -105,7 +104,6 @@ export const desactivarCategoria = async (req, res) => {
     })
 
   const desactivadoError = validarDesactivado(categoria, 'categoria')
-  console.log(desactivadoError)
   if (desactivadoError)
     return res.status(404).json({ msg: desactivadoError.message })
 

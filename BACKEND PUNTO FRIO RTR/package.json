@@ -14,14 +14,11 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "express-fileupload": "^1.5.1",
-    "fs-extra": "^11.2.0",
-    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.5.0",
     "mongoose": "^8.7.3",
     "nodemailer": "^6.9.15"
   },
