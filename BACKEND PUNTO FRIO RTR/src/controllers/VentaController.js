@@ -94,14 +94,6 @@ export const obtenerVentas = async (req, res) => {
 
   const { fechaInicio, fechaFin } = req.query
 
-  if (fechaInicio && fechaFin) {
-    const filtro = {
-      fecha: {
-        $gte: new Date(fechaInicio),
-        $lte: new Date(fechaFin),
-      },
-    }
-  }
 
   const ventas = await VentaSchema.find(filtro)
     .sort({ createdAt: -1 })
