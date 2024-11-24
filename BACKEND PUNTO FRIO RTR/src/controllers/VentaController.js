@@ -92,7 +92,7 @@ export const obtenerVentas = async (req, res) => {
   const limite = parseInt(req.query.limite) || 10
   const skip = (pagina - 1) * limite
 
-  const ventas = await VentaSchema.find(filtro)
+  const ventas = await VentaSchema.find()
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limite)
@@ -122,9 +122,10 @@ export const obtenerVenta = async (req, res) => {
     .populate('producto_id', 'nombre precio_unitario')
     .lean()
 
-  console.log(venta._id)
 
-  venta.detalles = detallesVenta
+  const ventaObjeto = venta.toObject()
+  ventaObjeto.detalles = detallesVenta
 
-  res.status(200).json(venta)
+  res.status(200).json(ventaObjeto)
+
 }

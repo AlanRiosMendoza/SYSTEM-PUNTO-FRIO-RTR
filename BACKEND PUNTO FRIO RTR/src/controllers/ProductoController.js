@@ -10,7 +10,6 @@ import {
 } from '../validators/ComunValidators.js'
 
 export const crearProducto = async (req, res) => {
-  console.log(req.body)
   const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })
 
@@ -44,7 +43,7 @@ export const obtenerProductos = async (req, res) => {
   const productos = await ProductoSchema.find(filtro)
     .skip(skip)
     .limit(limite)
-    .select('_id nombre descripcion precio imagen retornable')
+    .select('_id nombre descripcion precio retornable stock')
     .populate('categoria_id', 'nombre')
 
   const ExistenciaError = validarSiExisten(productos, 'productos')

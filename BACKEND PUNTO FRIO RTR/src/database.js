@@ -7,7 +7,7 @@ const connection = async () => {
     // Determinar la URL de conexión según el entorno
     const dbUrl =
       process.env.NODE_ENV === 'test'
-        ? process.env.MONGODB_URL_TEST
+        ? process.env.MONGODB_URL_TEST_ATLAS
         : process.env.NODE_ENV === 'production'
           ? process.env.MONGODB_URL_PRODUCTION
           : process.env.MONGODB_URL_DEVELOPMENT

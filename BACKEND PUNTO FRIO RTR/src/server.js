@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+
 import routerUsuario from './routes/Usuario.routes.js'
 import routerCategoria from './routes/Categoria.routes.js'
 import routerProducto from './routes/Producto.routes.js'
@@ -14,11 +15,10 @@ dotenv.config()
 
 // Configuraciones
 app.set('port', process.env.PORT || 3000)
-app.use(cors({ allowedHeaders: 'Content-Type, Authorization' }))
+app.use(cors())
 
 // Middlewares
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }));
 
 // Rutas
 app.get('/', (req, res) => res.send('Servidor de Punto Frio RTR'))

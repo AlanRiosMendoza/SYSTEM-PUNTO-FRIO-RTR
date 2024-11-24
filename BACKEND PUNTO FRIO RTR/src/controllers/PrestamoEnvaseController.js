@@ -14,7 +14,7 @@ export const crearPrestamoEnvase = async (req, res) => {
 
   const prestamoEnvase = new PrestamoEnvaseSchema(req.body)
   await prestamoEnvase.save()
-  res.status(201).json(prestamoEnvase)
+  res.status(201).json({ msg: 'Préstamo de envase creado' })
 }
 
 export const obtenerPrestamosEnvase = async (req, res) => {
@@ -29,7 +29,7 @@ export const obtenerPrestamosEnvase = async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limite)
-    .populate('cliente_id', 'nombre apellido')
+    .populate('cliente_id', 'nombre apellido cedula')
 
   const ExistenciaError = validarSiExisten(
     prestamosEnvase,
