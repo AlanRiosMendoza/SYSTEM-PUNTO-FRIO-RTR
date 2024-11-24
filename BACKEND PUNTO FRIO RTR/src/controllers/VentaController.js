@@ -122,10 +122,8 @@ export const obtenerVenta = async (req, res) => {
     .populate('producto_id', 'nombre precio_unitario')
     .lean()
 
-
   const ventaObjeto = venta.toObject()
   ventaObjeto.detalles = detallesVenta
 
   res.status(200).json(ventaObjeto)
-
 }

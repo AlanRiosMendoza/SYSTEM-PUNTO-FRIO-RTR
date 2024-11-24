@@ -79,5 +79,5 @@ export const devolverPrestamoEnvase = async (req, res) => {
 
   await prestamoEnvase.save()
 
-  res.status(200).json({msg: 'Préstamo de envase devuelto'})
+  res.status(200).json({ msg: 'Préstamo de envase devuelto' })
 }
