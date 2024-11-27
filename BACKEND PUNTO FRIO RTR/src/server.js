@@ -19,7 +19,6 @@ app.use(cors())
 
 // Middlewares
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
 // Rutas
 app.get('/', (req, res) => res.send('Servidor de Punto Frio RTR'))
