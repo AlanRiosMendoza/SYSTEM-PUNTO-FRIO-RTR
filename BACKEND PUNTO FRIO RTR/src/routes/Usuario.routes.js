@@ -4,7 +4,7 @@ import {
   login,
   obtenerUsuarios,
   obtenerUsuario,
-  actualizarUsuario,
+  actualizarPerfil,
   recuperarPassword,
   nuevoPassword,
   perfil,
@@ -21,25 +21,15 @@ import {
 const router = Router()
 
 router.post('/registro', verificarAdministrador, registro)
-
 router.post('/login', login)
-
 router.get('/usuarios', verificarAdministrador, obtenerUsuarios)
-
 router.get('/usuario/:id', verificarAdministrador, obtenerUsuario)
-
-router.put('/usuario/:id', verificarAutenticacion, actualizarUsuario)
-
-router.post('/recuperar-password', recuperarPassword)
-
-router.post('/nuevo-password/:token', nuevoPassword)
-
 router.get('/perfil', verificarAutenticacion, perfil)
-
+router.put('/usuario', verificarAutenticacion, actualizarPerfil)
+router.post('/recuperar-password', recuperarPassword)
+router.post('/nuevo-password/:token', nuevoPassword)
 router.put('/actualizar-password', verificarAutenticacion, actualizarPassword)
-
 router.put('/cambiar-role/:id', verificarAdministrador, cambiarRole)
-
 router.patch(
   '/desactivar-usuario/:id',
   verificarAdministrador,

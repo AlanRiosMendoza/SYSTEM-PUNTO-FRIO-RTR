@@ -114,7 +114,7 @@ export const obtenerUsuarios = async (req, res) => {
   const usuarios = await UsuarioSchema.find(filtro)
     .skip(skip)
     .limit(limite)
-    .select('_id cedula nombre apellido rol correo telefono activo')
+    .select('_id cedula nombre apellido rol correo telefono activo fechaUltimoAcceso')
 
   const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
   if (ExistenciaError) {
@@ -129,7 +129,7 @@ export const obtenerUsuario = async (req, res) => {
   if (idError) return res.status(400).json({ msg: idError.message })
 
   const usuario = await UsuarioSchema.findById(req.params.id).select(
-    '_id nombre apellido rol correo cedula telefono activo',
+    '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
   )
 
   const ExistenciaError = validarSiExisten(usuario, 'usuario')
@@ -141,17 +141,9 @@ export const obtenerUsuario = async (req, res) => {
   res.status(200).json(usuario)
 }
 
-export const actualizarUsuario = async (req, res) => {
-  const idError = validarObjectId(req.params.id)
-  if (idError) return res.status(400).json({ msg: idError.message })
+export const actualizarPerfil = async (req, res) => {
 
-  const usuario = await UsuarioSchema.findById(req.params.id)
-
-  const ExistenciaError = validarSiExisten(usuario, 'usuario')
-  if (ExistenciaError)
-    return res
-      .status(404)
-      .json({ msg: `No se encontró un usuario con el ID: ${req.params.id}` })
+  const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id)
 
   const camposVaciosError = validarCamposVacios(req.body)
   if (camposVaciosError)
@@ -244,7 +236,9 @@ export const nuevoPassword = async (req, res) => {
 }
 
 export const perfil = async (req, res) => {
-  res.status(200).json(req.UsuarioSchema)
+  res.status(200).json(req.UsuarioSchema).select(
+    '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
+  )
 }
 
 export const actualizarPassword = async (req, res) => {
