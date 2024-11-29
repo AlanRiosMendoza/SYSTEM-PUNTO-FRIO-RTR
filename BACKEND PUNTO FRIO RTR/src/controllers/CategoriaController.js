@@ -81,11 +81,13 @@ export const actualizarCategoria = async (req, res) => {
       msg: `No se encontró esa categoría con ese ID: ${req.params.id}`,
     })
 
-  const nombreError = await validarNombreUnico(req.body.nombre, 'categoria')
-  if (nombreError) return res.status(400).json({ msg: nombreError.message })
+  if (req.body.nombre && req.body.nombre !== categoria.nombre) {
+    const nombreError = await validarNombreUnico(req.body.nombre, 'categoria')
+    if (nombreError) return res.status(400).json({ msg: nombreError.message })
+    categoria.nombre = req.body.nombre
+  }
 
-  categoria.nombre = req.body.nombre
-  categoria.descripcion = req.body.descripcion
+  if (req.body.descripcion) categoria.descripcion = req.body.descripcion
 
   await categoria.save()
 

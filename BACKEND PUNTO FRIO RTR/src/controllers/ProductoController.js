@@ -79,16 +79,18 @@ export const actualizarProducto = async (req, res) => {
   const ExistenciaError = validarSiExisten(producto, 'productos')
   if (ExistenciaError)
     return res
-      .status(404)
-      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+  .status(404)
+  .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+  
+  if (req.body.nombre && req.body.nombre !== producto.nombre) {
+    const nombreError = await validarNombreUnico(req.body.nombre, 'producto', req.params.id)
+    if (nombreError) return res.status(400).json({ msg: nombreError.message })
+    producto.nombre = req.body.nombre
+  }
 
-  const nombreError = await validarNombreUnico(req.body.nombre, 'producto')
-  if (nombreError) return res.status(400).json({ msg: nombreError.message })
-
-  producto.nombre = req.body.nombre
-  producto.categoria_id = req.body.categoria_id
-  producto.precio = req.body.precio
-  producto.retornable = req.body.retornable
+  if (req.body.categoria_id && req.body.categoria_id !== producto.categoria_id) producto.categoria_id = req.body.categoria_id
+  if (req.body.precio && req.body.precio !== producto.precio ) producto.precio = req.body.precio
+  if (req.body.retornable && req.body.retornable !== producto.retornable) producto.retornable = req.body.retornable
 
   await producto.save()
 

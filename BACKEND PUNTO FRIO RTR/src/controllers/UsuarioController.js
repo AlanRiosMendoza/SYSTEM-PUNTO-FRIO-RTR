@@ -157,7 +157,7 @@ export const actualizarUsuario = async (req, res) => {
   if (camposVaciosError)
     return res.status(400).json({ msg: camposVaciosError.message })
 
-  if (req.body.correo) {
+  if (req.body.correo && req.body.correo !== usuario.correo) {
     const correoError = validarCorreoElectronico(req.body.correo)
     if (correoError) return res.status(400).json({ msg: correoError.message })
 
@@ -167,22 +167,29 @@ export const actualizarUsuario = async (req, res) => {
     usuario.correo = req.body.correo
   }
 
-  const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
-  if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
+  if (req.body.cedula && req.body.cedula !== usuario.cedula) {
+    const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
+    if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
+    usuario.cedula = req.body.cedula
+  }
 
-  const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre')
-  if (nombreError) return res.status(400).json({ msg: nombreError.message })
+  if (req.body.nombre && req.body.nombre !== usuario.nombre) {
+    const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre')
+    if (nombreError) return res.status(400).json({ msg: nombreError.message })
+    usuario.nombre = req.body.nombre
+  }
 
-  const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
-  if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
+  if (req.body.apellido && req.body.apellido !== usuario.apellido) {
+    const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
+    if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
+    usuario.apellido = req.body.apellido
+  }
 
-  const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
-  if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
-
-  usuario.nombre = req.body.nombre
-  usuario.apellido = req.body.apellido
-  usuario.telefono = req.body.telefono
-  usuario.cedula = req.body.cedula
+  if (req.body.telefono && req.body.telefono !== usuario.telefono) {
+    const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
+    if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
+    usuario.telefono = req.body.telefono
+  }
 
   await usuario.save()
 
