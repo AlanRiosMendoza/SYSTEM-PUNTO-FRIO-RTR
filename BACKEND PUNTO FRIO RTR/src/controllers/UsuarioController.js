@@ -114,7 +114,9 @@ export const obtenerUsuarios = async (req, res) => {
   const usuarios = await UsuarioSchema.find(filtro)
     .skip(skip)
     .limit(limite)
-    .select('_id cedula nombre apellido rol correo telefono activo fechaUltimoAcceso')
+    .select(
+      '_id cedula nombre apellido rol correo telefono activo fechaUltimoAcceso',
+    )
 
   const ExistenciaError = validarSiExisten(usuarios, 'usuarios')
   if (ExistenciaError) {
@@ -142,7 +144,6 @@ export const obtenerUsuario = async (req, res) => {
 }
 
 export const actualizarPerfil = async (req, res) => {
-
   const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id)
 
   const camposVaciosError = validarCamposVacios(req.body)
@@ -172,14 +173,24 @@ export const actualizarPerfil = async (req, res) => {
   }
 
   if (req.body.apellido && req.body.apellido !== usuario.apellido) {
-    const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido')
-    if (apellidoError) return res.status(400).json({ msg: apellidoError.message })
+    const apellidoError = validarLongitudPalabra(
+      req.body.apellido,
+      2,
+      'apellido',
+    )
+    if (apellidoError)
+      return res.status(400).json({ msg: apellidoError.message })
     usuario.apellido = req.body.apellido
   }
 
   if (req.body.telefono && req.body.telefono !== usuario.telefono) {
-    const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono')
-    if (telefonoError) return res.status(400).json({ msg: telefonoError.message })
+    const telefonoError = validarLongitudNumero(
+      req.body.telefono,
+      10,
+      'teléfono',
+    )
+    if (telefonoError)
+      return res.status(400).json({ msg: telefonoError.message })
     usuario.telefono = req.body.telefono
   }
 
@@ -236,9 +247,7 @@ export const nuevoPassword = async (req, res) => {
 }
 
 export const perfil = async (req, res) => {
-  res.status(200).json(req.UsuarioSchema).select(
-    '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
-  )
+  res.status(200).json(req.UsuarioSchema)
 }
 
 export const actualizarPassword = async (req, res) => {

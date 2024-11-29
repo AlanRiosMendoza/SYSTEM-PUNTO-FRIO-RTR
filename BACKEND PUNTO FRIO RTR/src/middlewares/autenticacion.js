@@ -15,13 +15,17 @@ export const verificarAutenticacion = async (req, res, next) => {
     if (rol === 'administrador') {
       req.UsuarioSchema = await UsuarioSchema.findById(id)
         .lean()
-        .select('-password')
+        .select(
+          '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
+        )
       next()
     }
     if (rol === 'cajero') {
       req.UsuarioSchema = await UsuarioSchema.findById(id)
         .lean()
-        .select('-password')
+        .select(
+          '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
+        )
       next()
     }
   } catch (error) {
@@ -44,7 +48,9 @@ export const verificarAdministrador = async (req, res, next) => {
     if (rol === 'administrador') {
       req.UsuarioSchema = await UsuarioSchema.findById(id)
         .lean()
-        .select('-password')
+        .select(
+          '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
+        )
       next()
     } else {
       return res.status(403).json({ msg: 'Acceso denegado: Rol no autorizado' })
@@ -68,7 +74,9 @@ export const verificarCajero = async (req, res, next) => {
     if (rol === 'cajero') {
       req.UsuarioSchema = await UsuarioSchema.findById(id)
         .lean()
-        .select('-password')
+        .select(
+          '_id nombre apellido rol correo cedula telefono activo fechaUltimoAcceso',
+        )
       next()
     } else {
       return res.status(403).json({ msg: 'Acceso denegado: Rol no autorizado' })
