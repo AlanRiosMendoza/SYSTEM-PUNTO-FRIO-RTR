@@ -143,7 +143,7 @@ export const obtenerVenta = async (req, res) => {
 }
 
 export const obtenerVentasPorFecha = async (req, res) => {
-  const { fechaInicio, fechaFin } = req.body
+  const { fechaInicio, fechaFin } = req.query
 
   if (!fechaInicio || !fechaFin) {
     return res.status(400).json({ msg: 'Los campos son requeridos' })
