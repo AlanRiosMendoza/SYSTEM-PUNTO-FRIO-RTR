@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import moment from 'moment-timezone'
 import VentaSchema from '../models/Venta.js'
 import DetalleVentaSchema from '../models/DetalleVenta.js'
 import ProductoSchema from '../models/Producto.js'
@@ -100,7 +101,17 @@ export const obtenerVentas = async (req, res) => {
     .populate('cliente_id', 'nombre apellido')
     .select('_id total fecha')
 
-  res.status(200).json(ventas)
+  const ventasObjeto = ventas.map((venta) => {
+    const fechaEcuador = moment(venta.fecha)
+      .tz('America/Guayaquil')
+      .format('YYYY-MM-DD HH:mm:ss')
+    return {
+      ...venta.toObject(),
+      fecha: fechaEcuador,
+    }
+  })
+
+  res.status(200).json(ventasObjeto)
 }
 
 export const obtenerVenta = async (req, res) => {
@@ -123,7 +134,91 @@ export const obtenerVenta = async (req, res) => {
     .lean()
 
   const ventaObjeto = venta.toObject()
+  ventaObjeto.fecha = moment(venta.fecha)
+    .tz('America/Guayaquil')
+    .format('YYYY-MM-DD HH:mm:ss')
   ventaObjeto.detalles = detallesVenta
 
   res.status(200).json(ventaObjeto)
+}
+
+export const obtenerVentasPorFecha = async (req, res) => {
+  const { fechaInicio, fechaFin } = req.query
+
+  if (!fechaInicio || !fechaFin) {
+    return res.status(400).json({ msg: 'Los campos son requeridos' })
+  }
+
+  const fechaInicioUTC = moment
+    .tz(fechaInicio, 'YYYY-MM-DD', 'America/Guayaquil')
+    .startOf('day')
+    .utc()
+    .toDate()
+
+  const fechaFinUTC = moment
+    .tz(fechaFin, 'YYYY-MM-DD', 'America/Guayaquil')
+    .endOf('day')
+    .set({ hour: 23, minute: 59, second: 59, millisecond: 999 })
+    .utc()
+    .toDate()
+
+  if (fechaInicio > fechaFin) {
+    return res.status(400).json({
+      msg: 'La fecha de inicio no puede ser mayor a la fecha de fin',
+    })
+  }
+
+  if (fechaInicio > new Date() || fechaFin > new Date()) {
+    return res.status(400).json({ msg: 'Las fechas no pueden ser futuras' })
+  }
+
+  let query = {
+    fecha: { $gte: fechaInicioUTC, $lte: fechaFinUTC },
+  }
+
+  if (req.UsuarioSchema.rol === 'administrador') {
+    const ventas = await VentaSchema.find(query)
+      .populate('usuario_id', 'nombre apellido')
+      .populate('cliente_id', 'nombre apellido')
+      .select('_id total fecha')
+
+    if (ventas.length === 0) {
+      return res.status(404).json({ msg: 'No se encontraron ventas' })
+    }
+
+    const ventasObjeto = ventas.map((venta) => {
+      const fechaEcuador = moment(venta.fecha)
+        .tz('America/Guayaquil')
+        .format('YYYY-MM-DD HH:mm:ss')
+      return {
+        ...venta.toObject(),
+        fecha: fechaEcuador,
+      }
+    })
+
+    return res.status(200).json(ventas)
+  }
+
+  if (req.UsuarioSchema.rol === 'cajero') {
+    query.usuario_id = req.UsuarioSchema._id
+    const ventas = await VentaSchema.find(query)
+      .populate('usuario_id', 'nombre apellido')
+      .populate('cliente_id', 'nombre apellido')
+      .select('_id total fecha')
+
+    if (ventas.length === 0) {
+      return res.status(404).json({ msg: 'No se encontraron ventas' })
+    }
+    const ventasObjeto = ventas.map((venta) => {
+      const fechaEcuador = moment(venta.fecha)
+        .tz('America/Guayaquil')
+        .format('YYYY-MM-DD HH:mm:ss')
+      return {
+        ...venta.toObject(),
+        fecha: fechaEcuador,
+      }
+    })
+
+    return res.status(200).json(ventasObjeto)
+  }
 }
