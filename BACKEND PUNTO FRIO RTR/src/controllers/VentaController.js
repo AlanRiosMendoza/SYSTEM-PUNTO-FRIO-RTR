@@ -176,49 +176,27 @@ export const obtenerVentasPorFecha = async (req, res) => {
     fecha: { $gte: fechaInicioUTC, $lte: fechaFinUTC },
   }
 
-  if (req.UsuarioSchema.rol === 'administrador') {
-    const ventas = await VentaSchema.find(query)
-      .populate('usuario_id', 'nombre apellido')
-      .populate('cliente_id', 'nombre apellido')
-      .select('_id total fecha')
-
-    if (ventas.length === 0) {
-      return res.status(404).json({ msg: 'No se encontraron ventas' })
-    }
-
-    const ventasObjeto = ventas.map((venta) => {
-      const fechaEcuador = moment(venta.fecha)
-        .tz('America/Guayaquil')
-        .format('YYYY-MM-DD HH:mm:ss')
-      return {
-        ...venta.toObject(),
-        fecha: fechaEcuador,
-      }
-    })
-
-    return res.status(200).json(ventas)
-  }
-
   if (req.UsuarioSchema.rol === 'cajero') {
-    query.usuario_id = req.UsuarioSchema._id
-    const ventas = await VentaSchema.find(query)
-      .populate('usuario_id', 'nombre apellido')
-      .populate('cliente_id', 'nombre apellido')
-      .select('_id total fecha')
-
-    if (ventas.length === 0) {
-      return res.status(404).json({ msg: 'No se encontraron ventas' })
-    }
-    const ventasObjeto = ventas.map((venta) => {
-      const fechaEcuador = moment(venta.fecha)
-        .tz('America/Guayaquil')
-        .format('YYYY-MM-DD HH:mm:ss')
-      return {
-        ...venta.toObject(),
-        fecha: fechaEcuador,
-      }
-    })
-
-    return res.status(200).json(ventasObjeto)
+    query.usuario_id = req.query.usuario_id
   }
+  const ventas = await VentaSchema.find(query)
+    .populate('usuario_id', 'nombre apellido')
+    .populate('cliente_id', 'nombre apellido')
+    .select('_id total fecha')
+
+  if (ventas.length === 0) {
+    return res.status(404).json({ msg: 'No se encontraron ventas' })
+  }
+
+  const ventasObjeto = ventas.map((venta) => {
+    const fechaEcuador = moment(venta.fecha)
+      .tz('America/Guayaquil')
+      .format('YYYY-MM-DD HH:mm:ss')
+    return {
+      ...venta.toObject(),
+      fecha: fechaEcuador,
+    }
+  })
+
+  return res.status(200).json(ventasObjeto)
 }
