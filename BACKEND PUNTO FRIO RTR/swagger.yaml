@@ -1,0 +1,1076 @@
+openapi: 3.0.0
+info:
+  title: PUNTO FRIO RTR
+  description: API para gestionar el sistema de Punto Frio RTR.
+  version: 1.0.0
+servers:
+  - url: https://system-punto-frio-rtr.onrender.com/api/v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+tags:
+  - name: USUARIOS
+  - name: CATEGORIAS
+  - name: PRODUCTOS
+  - name: INVENTARIOS
+  - name: CLIENTES
+  - name: VENTAS
+  - name: ENVASES
+
+paths:
+  /registro:
+    post:
+      tags:
+        - USUARIOS
+      summary: REGISTRAR USUARIO
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  description: Dirección de correo electrónico del usuario.
+                contrasenia:
+                  type: string
+                  description: Contraseña que el usuario establecerá para su cuenta.
+                cedula:
+                  type: string
+                  description: Número de cédula de identidad del usuario.
+                telefono:
+                  type: string
+                  description: Número de teléfono de contacto del usuario.
+                nombre:
+                  type: string
+                  description: Primer nombre del usuario.
+                apellido:
+                  type: string
+                  description: Apellido del usuario.
+                rol:
+                  type: string
+                  enum: [administrador, cajero]
+                  description: Rol del usuario dentro del sistema.
+      responses:
+        '200':
+          description: Registro exitoso del usuario
+          content:
+            application/json: {}
+
+  /login:
+    post:
+      tags:
+        - USUARIOS
+      summary: INICIAR SESIÓN
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  description: Dirección de correo electrónico del usuario para iniciar sesión.
+                contrasenia:
+                  type: string
+                  description: Contraseña del usuario para iniciar sesión.
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+          content:
+            application/json: {}
+
+  /usuarios:
+    get:
+      tags:
+        - USUARIOS
+      summary: VER TODOS LOS USUARIOS
+      description: Obtiene una lista paginada de usuarios con filtros opcionales por estado y nombre.
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Número de página para paginación.
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad de usuarios a obtener por página.
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: boolean
+            enum: [true, false]
+          description: Estado de los usuarios a filtrar, activo o inactivo.
+        - name: cedula
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filtro por coincidencias parciales en la cédula de los usuarios.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json: {}
+
+  # Continuación en el mismo formato para cada campo en las rutas restantes:
+
+  /usuario/{id}:
+    get:
+      tags:
+        - USUARIOS
+      summary: VER UN USUARIO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID único del usuario a consultar.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Detalle del usuario
+          content:
+            application/json: {}
+
+  /perfil:
+    get:
+      tags:
+        - USUARIOS
+      summary: VER PERFIL DEL USUARIO AUTENTICADO
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Detalle del perfil del usuario autenticado
+          content:
+            application/json: {}
+    put:
+      tags:
+        - USUARIOS
+      summary: ACTUALIZAR PERFIL
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  description: Nuevo correo electrónico del usuario.
+                cedula:
+                  type: string
+                  description: Nueva cédula de identidad del usuario.
+                nombre:
+                  type: string
+                  description: Nuevo nombre del usuario.
+                apellido:
+                  type: string
+                  description: Nuevo apellido del usuario.
+                telefono:
+                  type: string
+                  description: Nuevo número de teléfono de contacto del usuario.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json: {}
+
+  # Cambio de contraseña del usuario
+  /actualizar-password:
+    put:
+      tags:
+        - USUARIOS
+      summary: ACTUALIZAR CONTRASEÑA
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                antiguaContrasenia:
+                  type: string
+                  description: Contraseña actual del usuario.
+                contrasenia:
+                  type: string
+                  description: Nueva contraseña que desea establecer el usuario.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Contraseña actualizada exitosamente
+          content:
+            application/json: {}
+
+  # Envío de email para recuperación de contraseña
+  /recuperar-password:
+    post:
+      tags:
+        - USUARIOS
+      summary: ENVIAR EMAIL PARA RECUPERAR CONTRASEÑA
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  description: Correo electrónico para enviar el enlace de recuperación de contraseña.
+      responses:
+        '200':
+          description: Email enviado para recuperar contraseña
+          content:
+            application/json: {}
+
+  # Establecimiento de nueva contraseña
+  /nuevo-password/{token}:
+    post:
+      tags:
+        - USUARIOS
+      summary: ESTABLECER NUEVA CONTRASEÑA
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Token de recuperación para establecer la nueva contraseña.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contrasenia:
+                  type: string
+                  description: Nueva contraseña que el usuario quiere establecer.
+      responses:
+        '200':
+          description: Contraseña establecida exitosamente
+          content:
+            application/json: {}
+
+  # Activación y desactivación de usuario
+  /desactivar-usuario/{id}:
+    patch:
+      tags:
+        - USUARIOS
+      summary: DESACTIVAR USUARIO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del usuario que se desea desactivar.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usuario desactivado exitosamente
+          content:
+            application/json: {}
+
+  /activar-usuario/{id}:
+    patch:
+      tags:
+        - USUARIOS
+      summary: ACTIVAR USUARIO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del usuario que se desea activar.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usuario activado exitosamente
+          content:
+            application/json: {}
+
+  # Cambio de rol de usuario
+  /cambiar-role/{id}:
+    put:
+      tags:
+        - USUARIOS
+      summary: CAMBIAR ROL DE USUARIO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del usuario cuyo rol se va a cambiar.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rol:
+                  type: string
+                  enum: [administrador, cajero]
+                  description: Nuevo rol asignado al usuario.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rol cambiado exitosamente
+          content:
+            application/json: {}
+
+  # Categorias
+  /categoria:
+    post:
+      tags:
+        - CATEGORIAS
+      summary: REGISTRAR CATEGORÍA
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre de la categoría a registrar
+                descripcion:
+                  type: string
+                  description: Descripción breve de la categoría
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Registro exitoso de la categoría
+          content:
+            application/json: {}
+
+  /categorias:
+    get:
+      tags:
+        - CATEGORIAS
+      summary: VER TODAS LAS CATEGORÍAS
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Número de la página que se desea consultar para la paginación de categorías
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad máxima de categorías que se devolverán en una sola página
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: boolean
+            enum: [true, false]
+          description: Estado de las categorías a filtrar; true para activas y false para inactivas
+        - name: nombre
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filtra las categorías que contengan el texto ingresado en su nombre
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa con la lista de categorías
+          content:
+            application/json: {}
+
+  /categoria/{id}:
+    get:
+      tags:
+        - CATEGORIAS
+      summary: VER UNA CATEGORÍA
+      parameters:
+        - name: id
+          in: path
+          description: ID único de la categoría a consultar
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa con los detalles de la categoría
+          content:
+            application/json: {}
+    put:
+      tags:
+        - CATEGORIAS
+      summary: ACTUALIZAR CATEGORÍA
+      parameters:
+        - name: id
+          in: path
+          description: ID único de la categoría que se desea actualizar
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre actualizado de la categoría
+                descripcion:
+                  type: string
+                  description: Descripción actualizada de la categoría
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa con la actualización de la categoría
+          content:
+            application/json: {}
+    patch:
+      tags:
+        - CATEGORIAS
+      summary: DESACTIVAR CATEGORÍA
+      parameters:
+        - name: id
+          in: path
+          description: ID único de la categoría que se desea desactivar
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa al desactivar la categoría
+          content:
+            application/json: {}
+
+  /categoria/activar/{id}:
+    patch:
+      tags:
+        - CATEGORIAS
+      summary: ACTIVAR CATEGORÍA
+      parameters:
+        - name: id
+          in: path
+          description: ID único de la categoría que se desea activar
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Respuesta exitosa al activar la categoría
+          content:
+            application/json: {}
+
+  # Productos
+  /producto:
+    post:
+      tags:
+        - PRODUCTOS
+      summary: REGISTRAR PRODUCTO
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre del producto a registrar
+                categoria_id:
+                  type: string
+                  description: ID de la categoría a la cual pertenece el producto
+                precio:
+                  type: number
+                  format: float
+                  description: Precio unitario del producto
+                retornable:
+                  type: boolean
+                  description: Indica si el producto es retornable (true) o no (false)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Registro exitoso del producto
+          content:
+            application/json: {}
+
+  /productos:
+    get:
+      tags:
+        - PRODUCTOS
+      summary: VER TODOS LOS PRODUCTOS
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Número de la página que se desea consultar para la paginación de productos
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad máxima de productos que se devolverán en una sola página
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: boolean
+            enum: [true, false]
+          description: Estado de los productos a filtrar; true para activos y false para inactivos
+        - name: nombre
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filtra los productos que contengan el texto ingresado en su nombre
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de todos los productos
+          content:
+            application/json: {}
+
+  /producto/{id}:
+    get:
+      tags:
+        - PRODUCTOS
+      summary: VER PRODUCTO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del producto a consultar
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Detalles del producto
+          content:
+            application/json: {}
+    put:
+      tags:
+        - PRODUCTOS
+      summary: ACTUALIZAR PRODUCTO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del producto a actualizar
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre actualizado del producto
+                categoria_id:
+                  type: string
+                  description: ID de la categoría a la que pertenece el producto
+                precio:
+                  type: number
+                  format: float
+                  description: Precio unitario actualizado del producto
+                retornable:
+                  type: boolean
+                  description: Indica si el producto es retornable o no
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Actualización exitosa del producto
+          content:
+            application/json: {}
+
+    patch:
+      tags:
+        - PRODUCTOS
+      summary: DESACTIVAR PRODUCTO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del producto a desactivar
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Producto desactivado exitosamente
+          content:
+            application/json: {}
+
+  /producto/activar/{id}:
+    patch:
+      tags:
+        - PRODUCTOS
+      summary: ACTIVAR PRODUCTO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del producto a activar
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Producto activado exitosamente
+          content:
+            application/json: {}
+
+  # Inventarios
+  /inventario:
+    post:
+      tags:
+        - INVENTARIOS
+      summary: CREAR INVENTARIO
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                producto_id:
+                  type: string
+                  description: ID del producto que se agregará o actualizará en el inventario
+                cantidad:
+                  type: integer
+                  description: Cantidad de unidades del producto para agregar o retirar del inventario
+                descripcion:
+                  type: string
+                  description: Explicación del motivo de movimiento, como una entrada o salida de producto
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Inventario creado o actualizado exitosamente
+          content:
+            application/json: {}
+
+  /inventarios:
+    get:
+      tags:
+        - INVENTARIOS
+      summary: VER TODOS LOS INVENTARIOS
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Número de página que se quiere consultar en la paginación de inventarios
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Número máximo de inventarios que se devolverán por página
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Se obtiene la lista completa de inventarios
+          content:
+            application/json: {}
+
+  /inventario/{id}:
+    get:
+      tags:
+        - INVENTARIOS
+      summary: VER UN INVENTARIO ESPECÍFICO
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del inventario a consultar
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Se obtiene un inventario específico
+          content:
+            application/json: {}
+
+  # Clientes
+  /cliente:
+    post:
+      tags:
+        - CLIENTES
+      summary: CREAR CLIENTE
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cedula:
+                  type: integer
+                  description: Número de cédula o identificación única del cliente
+                nombre:
+                  type: string
+                  description: Nombre del cliente
+                apellido:
+                  type: string
+                  description: Apellido del cliente
+                correo:
+                  type: string
+                  description: Dirección de correo electrónico del cliente
+                telefono:
+                  type: integer
+                  description: Número de teléfono del cliente
+                direccion:
+                  type: string
+                  description: Dirección de residencia del cliente
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cliente creado exitosamente
+          content:
+            application/json: {}
+
+  /clientes:
+    get:
+      tags:
+        - CLIENTES
+      summary: VER TODOS LOS CLIENTES
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Número de página a consultar en la paginación de clientes
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad de clientes a mostrar por página
+        - name: cedula
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Filtra los clientes por coincidencias parciales en el número de cédula
+      responses:
+        '200':
+          description: Lista de todos los clientes obtenida exitosamente
+          content:
+            application/json: {}
+
+  /cliente/{id}:
+    get:
+      tags:
+        - CLIENTES
+      summary: VER CLIENTE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del cliente a consultar
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Detalles del cliente obtenidos exitosamente
+          content:
+            application/json: {}
+
+    put:
+      tags:
+        - CLIENTES
+      summary: ACTUALIZAR CLIENTE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del cliente a actualizar
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cedula:
+                  type: integer
+                  description: Número de cédula o identificación única del cliente
+                nombre:
+                  type: string
+                  description: Nombre del cliente
+                apellido:
+                  type: string
+                  description: Apellido del cliente
+                correo:
+                  type: string
+                  description: Dirección de correo electrónico del cliente
+                telefono:
+                  type: integer
+                  description: Número de teléfono del cliente
+                direccion:
+                  type: string
+                  description: Dirección de residencia del cliente
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cliente actualizado exitosamente
+          content:
+            application/json: {}
+
+  # Ventas
+  /venta:
+    post:
+      tags:
+        - VENTAS
+      summary: CREAR VENTA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cliente_id:
+                  type: string
+                  description: ID del cliente que realiza la compra
+                productos:
+                  type: array
+                  description: Lista de productos incluidos en la compra
+                  items:
+                    type: object
+                    properties:
+                      producto_id:
+                        type: string
+                        description: ID único del producto a comprar
+                      cantidad:
+                        type: integer
+                        description: Cantidad de unidades del producto solicitado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Venta registrada exitosamente
+          content:
+            application/json: {}
+
+  /ventas:
+    get:
+      tags:
+        - VENTAS
+      summary: VER TODAS LAS VENTAS
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pagina
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Número de página a consultar para paginación de ventas
+        - name: limite
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Cantidad de ventas a mostrar por página
+      responses:
+        '200':
+          description: Lista completa de todas las ventas realizadas
+          content:
+            application/json: {}
+
+  /venta/{id}:
+    get:
+      tags:
+        - VENTAS
+      summary: VER DETALLES DE UNA VENTA
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID único de la venta a consultar
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Detalles específicos de la venta solicitada
+          content:
+            application/json: {}
+
+  /ventas/informe:
+    get:
+      summary: OBTIENE UN INFORME POR RANFOS DE FECHAS.
+      tags:
+        - VENTAS
+      parameters:
+        - in: query
+          name: fechaInicio
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2024-01-01'
+          description: Fecha de inicio del rango en formato `YYYY-MM-DD`.
+        - in: query
+          name: fechaFin
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2024-01-31'
+          description: Fecha de fin del rango en formato `YYYY-MM-DD`.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de ventas encontradas.
+          content:
+            application/json: {}
+
+  # Envases
+  /envase:
+    post:
+      tags:
+        - ENVASES
+      summary: CREAR PRÉSTAMO DE ENVASE
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cliente_id:
+                  type: string
+                  description: ID único del cliente que solicita el préstamo de envase
+                prestamo:
+                  type: string
+                  description: Detalles del préstamo, incluyendo tipo y cantidad de envases solicitados
+                deposito:
+                  type: string
+                  description: Información sobre el depósito requerido para el préstamo de envases
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Préstamo de envase creado exitosamente
+          content:
+            application/json: {}
+
+  /envases:
+    get:
+      tags:
+        - ENVASES
+      summary: VER TODOS LOS PRÉSTAMOS DE ENVASES
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista completa de todos los préstamos de envases
+          content:
+            application/json: {}
+
+  /envase/{id}:
+    get:
+      tags:
+        - ENVASES
+      summary: VER DETALLES DE PRÉSTAMO DE ENVASE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID único del préstamo de envase a consultar
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Detalles específicos del préstamo de envase solicitado
+          content:
+            application/json: {}
+
+    put:
+      tags:
+        - ENVASES
+      summary: DEVOLVER PRÉSTAMO DE ENVASE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID único del préstamo de envase a devolver
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Préstamo de envase devuelto exitosamente
+          content:
+            application/json: {}

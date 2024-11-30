@@ -1,6 +1,8 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import swaggerUi from 'swagger-ui-express'
+import yaml from 'yamljs'
 
 import routerUsuario from './routes/Usuario.routes.js'
 import routerCategoria from './routes/Categoria.routes.js'
@@ -30,6 +32,10 @@ app.use('/api/v1', routerCliente)
 app.use('/api/v1', routerVenta)
 app.use('/api/v1', routerPrestamoEnvase)
 app.use('/api/v1', routerDetalleInventario)
+
+// Swagger
+const swaggerDocument = yaml.load('./swagger.yaml')
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 // Manejo de una ruta que no sea encontrada
 app.use((req, res) => res.status(404).send('Page not found'))
