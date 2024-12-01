@@ -1,3 +1,4 @@
+import moment from 'moment-timezone'
 import DetalleInventarioSchema from '../models/DetalleInventario.js'
 import {
   validarObjectId,
@@ -48,7 +49,17 @@ export const obtenerDetalleInventario = async (req, res) => {
   if (ExistenciaError)
     return res.status(404).json({ msg: ExistenciaError.message })
 
-  res.status(200).json(detalleInventario)
+  const inventarioObjeto = detalleInventario.map((detalle) => {
+    const fechaEcuador = moment(detalle.fecha)
+      .tz('America/Guayaquil')
+      .format('YYYY-MM-DD HH:mm:ss')
+    return {
+      ...detalle.toObject(),
+      fecha: fechaEcuador,
+    }
+  })
+
+  res.status(200).json(inventarioObjeto)
 }
 
 export const obtenerDetalleInventarioPorId = async (req, res) => {
@@ -71,5 +82,11 @@ export const obtenerDetalleInventarioPorId = async (req, res) => {
       msg: `No se encontró ese detalle de inventario con ese ID: ${req.params.id}`,
     })
 
-  res.status(200).json(detalleInventario)
+  const inventarioObjeto = detalleInventario.toObject()
+
+  inventarioObjeto.fecha = moment(detalleInventario.fecha)
+    .tz('America/Guayaquil')
+    .format('YYYY-MM-DD HH:mm:ss')
+
+  res.status(200).json(inventarioObjeto)
 }
