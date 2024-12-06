@@ -33,13 +33,63 @@ export const Register = () => {
             return; // Detener el envío del formulario si la validación falla
         }
         try {
-            const url = "http://localhost:3000/api/v1/registro"
-            const respuesta = await axios.post(url, form)
-            setMensaje({respuesta:respuesta.data.msg,tipo:true})
-            setform({})
+            // Obtén el token del almacenamiento local
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No se encontró ningún token. Por favor, inicia sesión.');
+                return;
+            }
+            const config = {
+                headers: {
+                  Authorization: `Bearer ${token}`, // Token en formato Bearer
+                  'Content-Type': 'application/json', // Ajusta según lo que necesites enviar
+                },
+            };
+            const url = `${import.meta.env.VITE_BACKEND_URL}/registro`;
+            const respuesta = await axios.post(url, form, config);
+            
+            // Si la solicitud fue exitosa
+            setMensaje({
+              respuesta: respuesta.data.msg, // El mensaje que el backend devuelve
+              tipo: true // Esto indica que fue un mensaje de éxito
+            });
+            setTimeout(() => {
+                setMensaje("");
+            }, 3000);
+          
+            // Limpiar el formulario
+            setForm({});
         } catch (error) {
-            setMensaje({respuesta:error.response.data?.errors[0].msg,tipo:false})
+            // Si ocurre un error
+            console.log(error);
+          
+            // Verificar si hay una respuesta de error (por ejemplo, 400) y acceder al mensaje correcto
+            if (error.response) {
+              // Verifica la estructura del error en el backend
+              const errorMessage = error.response.data?.msg || "Error desconocido";  // Si no hay 'msg', muestra un mensaje por defecto
+              
+              // Si el backend tiene errores en un array (como en `errors[0].msg`)
+              const validationErrorMessage = error.response.data?.errors?.[0]?.msg;
+          
+              setMensaje({
+                respuesta: validationErrorMessage || errorMessage, // Usa el mensaje de validación o el mensaje por defecto
+                tipo: false // Esto indica que es un mensaje de error
+              });
+              setTimeout(() => {
+                setMensaje("");
+            }, 3000);
+            } else {
+              // Si no hay una respuesta (error de red, servidor no disponible, etc.)
+              setMensaje({
+                respuesta: "Error de conexión o el servidor no respondió.",
+                tipo: false
+              });
+              setTimeout(() => {
+                setMensaje("");
+            }, 3000);
+            }
         }
+          
     }
 
     return (
