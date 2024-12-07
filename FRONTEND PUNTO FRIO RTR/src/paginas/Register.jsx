@@ -58,7 +58,7 @@ export const Register = () => {
             }, 3000);
           
             // Limpiar el formulario
-            setForm({});
+            setform("");
         } catch (error) {
             // Si ocurre un error
             console.log(error);
