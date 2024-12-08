@@ -17,81 +17,101 @@ export const Register = () => {
     })
 
     const handlerChange = (e) => {
-        // Si el campo es 'rol', transformamos el valor a minúsculas
-        const value = e.target.name === "rol" ? e.target.value.toLowerCase() : e.target.value;
-        
-        setform({...form,
-            [e.target.name]:e.target.value
-        })
-    }
-
-    const handlerSubmit = async(e) => {
-        e.preventDefault()
-        // Validación del campo 'rol'
+        const { name, value } = e.target;
+        setform({
+            ...form,
+            [name]: name === "rol" ? value.toLowerCase() : value, // Convertir rol a minúsculas
+        });
+    };
+    
+    const handlerSubmit = async (e) => {
+        e.preventDefault();
+    
+        // Validación de nombre
+        if (!form.nombre || form.nombre.trim().length < 3) {
+            setMensaje({ respuesta: "El nombre es obligatorio y debe tener al menos 3 caracteres.", tipo: false });
+            return;
+        }
+    
+        // Validación de apellido
+        if (!form.apellido || form.apellido.trim().length < 3) {
+            setMensaje({ respuesta: "El apellido es obligatorio y debe tener al menos 3 caracteres.", tipo: false });
+            return;
+        }
+    
+        // Validación de cédula (por ejemplo, que sea numérica y tenga una longitud específica)
+        if (!form.cedula || form.cedula.trim().length !== 10 || isNaN(form.cedula)) {
+            setMensaje({ respuesta: "La cédula debe tener exactamente 10 dígitos numéricos.", tipo: false });
+            return;
+        }
+    
+        // Validación de correo
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!form.correo || !emailRegex.test(form.correo)) {
+            setMensaje({ respuesta: "El correo es obligatorio y debe tener un formato válido.", tipo: false });
+            return;
+        }
+    
+        // Validación de teléfono (10 dígitos)
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!form.telefono || !phoneRegex.test(form.telefono)) {
+            setMensaje({ respuesta: "El número de teléfono debe tener exactamente 10 dígitos.", tipo: false });
+            return;
+        }
+    
+        // Validación de rol
         if (form.rol !== "cajero" && form.rol !== "administrador") {
             setMensaje({ respuesta: "El rol debe ser 'cajero' o 'administrador'.", tipo: false });
-            return; // Detener el envío del formulario si la validación falla
+            return;
         }
+    
+        // Envío al backend
         try {
-            // Obtén el token del almacenamiento local
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token");
             if (!token) {
-                console.error('No se encontró ningún token. Por favor, inicia sesión.');
+                console.error("No se encontró ningún token. Por favor, inicia sesión.");
                 return;
             }
+    
             const config = {
                 headers: {
-                  Authorization: `Bearer ${token}`, // Token en formato Bearer
-                  'Content-Type': 'application/json', // Ajusta según lo que necesites enviar
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
                 },
             };
+    
             const url = `${import.meta.env.VITE_BACKEND_URL}/registro`;
             const respuesta = await axios.post(url, form, config);
-            
-            // Si la solicitud fue exitosa
+    
             setMensaje({
-              respuesta: respuesta.data.msg, // El mensaje que el backend devuelve
-              tipo: true // Esto indica que fue un mensaje de éxito
+                respuesta: respuesta.data.msg,
+                tipo: true,
             });
+    
             setTimeout(() => {
-                setMensaje("");
+                setMensaje({});
             }, 3000);
-          
-            // Limpiar el formulario
-            setform("");
+    
+            // Limpieza del formulario
+            setform({
+                nombre: "",
+                apellido: "",
+                cedula: "",
+                correo: "",
+                contrasenia: "",
+                telefono: "",
+                rol: "",
+            });
         } catch (error) {
-            // Si ocurre un error
-            console.log(error);
-          
-            // Verificar si hay una respuesta de error (por ejemplo, 400) y acceder al mensaje correcto
-            if (error.response) {
-              // Verifica la estructura del error en el backend
-              const errorMessage = error.response.data?.msg || "Error desconocido";  // Si no hay 'msg', muestra un mensaje por defecto
-              
-              // Si el backend tiene errores en un array (como en `errors[0].msg`)
-              const validationErrorMessage = error.response.data?.errors?.[0]?.msg;
-          
-              setMensaje({
-                respuesta: validationErrorMessage || errorMessage, // Usa el mensaje de validación o el mensaje por defecto
-                tipo: false // Esto indica que es un mensaje de error
-              });
-              setTimeout(() => {
-                setMensaje("");
-            }, 3000);
-            } else {
-              // Si no hay una respuesta (error de red, servidor no disponible, etc.)
-              setMensaje({
-                respuesta: "Error de conexión o el servidor no respondió.",
-                tipo: false
-              });
-              setTimeout(() => {
-                setMensaje("");
-            }, 3000);
-            }
+            console.error(error);
+            const errorMessage = error.response?.data?.msg || "Error desconocido";
+            setMensaje({ respuesta: errorMessage, tipo: false });
+            setTimeout(() => {
+                setMensaje({});
+            }, 5000);
         }
-          
-    }
-
+    };
+    
     return (
         <>
             
@@ -123,9 +143,20 @@ export const Register = () => {
 
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold text-gray-400" htmlFor="cedula">Cédula</label>
-                            <input type="tel" 
-                            id="cedula" name="cedula" value={form.cedula || ""} onChange={handlerChange}
-                            placeholder="099999999" className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" />
+                            <input
+                                type="text" // Usamos texto porque type="number" permite valores negativos y decimales
+                                id="cedula"
+                                name="cedula"
+                                value={form.cedula || ""}
+                                maxLength="10" // Límite máximo de 10 caracteres
+                                onChange={handlerChange}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^0-9]/g, ""); // Permitir solo números
+                                }}
+                                placeholder="0999999999"
+                                className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black"
+                                required
+                            />
                         </div>
 
                         <div className="mb-3">
@@ -143,15 +174,34 @@ export const Register = () => {
                         </div>
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold text-gray-400" htmlFor="telefono">Teléfono</label>
-                            <input type="tel" 
-                            id="telefono" name="telefono" value={form.telefono || ""} onChange={handlerChange}
-                            placeholder="0987654321" className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" />
+                            <input
+                                type="text" // Usamos texto porque type="number" permite valores negativos y decimales
+                                id="telefono"
+                                name="telefono"
+                                value={form.telefono || ""}
+                                maxLength="10" // Límite máximo de 10 caracteres
+                                onChange={handlerChange}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/[^0-9]/g, ""); // Permitir solo números
+                                }}
+                                placeholder="0987654321"
+                                className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black"
+                                required
+                            />
                         </div>
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold text-gray-400" htmlFor="rol">Rol</label>
-                            <input type="text" 
-                            id="rol" name="rol" value={form.rol || ""} onChange={handlerChange}
-                            placeholder="Cajero o Administrador" className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" />
+                            <select
+                                id="rol"
+                                name="rol"
+                                value={form.rol}
+                                onChange={handlerChange}
+                                className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black"
+                            >
+                                <option value="">Seleccionar rol</option>
+                                <option value="cajero">Cajero</option>
+                                <option value="administrador">Administrador</option>
+                            </select>
                         </div>
                         
                         <div className="mb-3">

@@ -43,7 +43,7 @@ export const obtenerProductos = async (req, res) => {
   const productos = await ProductoSchema.find(filtro)
     .skip(skip)
     .limit(limite)
-    .select('_id nombre descripcion precio retornable stock')
+    .select('_id nombre descripcion precio activo retornable stock')
     .populate('categoria_id', 'nombre')
 
   const ExistenciaError = validarSiExisten(productos, 'productos')
