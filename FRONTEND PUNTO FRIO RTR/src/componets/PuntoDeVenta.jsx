@@ -8,12 +8,10 @@ const PuntoDeVenta = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
   const [cantidad, setCantidad] = useState(1);
   const [total, setTotal] = useState(0);
-  const [clienteId, setClienteId] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [busqueda, setBusqueda] = useState(""); // Estado para el filtro de búsqueda
-
+  
    // Estados para manejar clientes
-  const [clientes, setClientes] = useState([]);
   const [busquedaCliente, setBusquedaCliente] = useState("");
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
 
@@ -59,11 +57,13 @@ const PuntoDeVenta = () => {
         setClienteSeleccionado(respuesta.data[0]);
         setMensaje("");
       } else {
-        setMensaje("La cédula ingresada no corresponde a ningún cliente.");
+        setMensaje("Ocurrió un error al buscar el cliente.");
+        setTimeout(() => setMensaje(""), 4000);
       }
     } catch (error) {
       console.error("Error al buscar cliente:", error);
-      setMensaje("Ocurrió un error al buscar el cliente.");
+      setMensaje("La cédula ingresada no corresponde a ningún cliente.");
+      setTimeout(() => setMensaje(""), 4000);
     }
   };
 
@@ -75,12 +75,13 @@ const PuntoDeVenta = () => {
   
     if (!producto) {
       setMensaje("Producto no encontrado");
-      setTimeout(() => setMensaje(""), 3000);
+      setTimeout(() => setMensaje(""), 4000);
       return;
     }
   
     if (cantidad <= 0) {
       setMensaje("La cantidad debe ser mayor a 0.");
+      setTimeout(() => setMensaje(""), 4000);
       return;
     }
   
@@ -88,6 +89,7 @@ const PuntoDeVenta = () => {
       setMensaje(
         `Stock insuficiente para ${producto.nombre}. Quedan ${producto.stock} unidades.`
       );
+      setTimeout(() => setMensaje(""), 4000);
       return;
     }
   
@@ -164,6 +166,7 @@ const PuntoDeVenta = () => {
       setProductosSeleccionados([]);
       setTotal(0);
       setClienteSeleccionado(null);
+      setBusquedaCliente("")
     } catch (error) {
       console.error("Error al realizar la venta:", error);
       setMensaje("Hubo un error al procesar la venta.");
@@ -186,18 +189,19 @@ const PuntoDeVenta = () => {
               type="text"
               placeholder="Ingrese la cédula del cliente..."
               value={busquedaCliente}
+              maxLength="10"
               onChange={(e) => setBusquedaCliente(e.target.value)}
               className="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />
             <button
                 onClick={() => buscarCliente(busquedaCliente)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                className="bg-blue-500 text-white px-4 py-2 mb-2 rounded-md hover:bg-blue-600 transition"
               >
                 Buscar
             </button>
 
-            {/* Mostrar mensaje si hay error */}
-            {mensaje && <p className="text-red-500 mt-4">{mensaje}</p>}
+            <div className="w-full border-t-4 border-dashed border-lime-600 my-4"></div>
+
           </div>
         ) : (
           <div>
@@ -214,13 +218,14 @@ const PuntoDeVenta = () => {
             >
               Cambiar Cliente
             </button>
+            <div className="w-full border-t-4 border-dashed border-lime-600 my-4"></div>
           </div>
         )}
 
 
         {/* Barra de búsqueda para seleccionar producto */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xl font-bold mb-4 text-gray-700">
             Buscar Producto:
           </label>
           <div className="flex gap-2">

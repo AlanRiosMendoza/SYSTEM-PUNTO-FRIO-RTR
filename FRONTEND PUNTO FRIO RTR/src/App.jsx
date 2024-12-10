@@ -18,6 +18,8 @@ import CajaDeVenta from './paginas/CajaDeVenta'
 import { AuthProvider } from './context/AuthProvider'
 import { PrivateRoute } from './routes/privateRoutes'
 
+import RoleBasedRoute from './context/RoleBasedRoute'
+
 function App() {
   return (
     <>

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import PuntoDeVenta from "../componets/PuntoDeVenta";
 import axios from "axios";
+import Mensaje from "../componets/Alertas/Mensaje"
 
 const CajaDeVenta = () => {
-  const [clienteId, setClienteId] = useState(""); // ID del cliente creado
   const [mostrarModal, setMostrarModal] = useState(false); // Controla el modal
   const [nuevoCliente, setNuevoCliente] = useState({
     nombre: "",
@@ -39,7 +39,6 @@ const CajaDeVenta = () => {
         respuesta: "Cliente creado exitosamente",
         tipo: true,
       });
-      setClienteId(respuesta.data.cliente_id); // Guarda el ID del cliente creado
       setMostrarModal(false); // Cierra el modal
       setNuevoCliente({
         nombre: "",
@@ -49,6 +48,9 @@ const CajaDeVenta = () => {
         telefono: "",
         direccion: ""
       });
+      setTimeout(() => {
+        setMensaje({});
+    }, 5000);
     } catch (error) {
       // Error al crear el cliente
       setMensaje({
@@ -56,20 +58,25 @@ const CajaDeVenta = () => {
           error.response?.data?.msg || "Error al crear el cliente.",
         tipo: false,
       });
+      setTimeout(() => {
+        setMensaje({});
+    }, 5000);
     }
   };
 
   return (
     <div>
       <h1 className="font-black text-4xl text-gray-500">Caja de Venta</h1>
-      <hr className="my-4" />
+      <hr className="my-2" />
 
-      <p className="mb-8">Listo para realizar una venta</p>
+      <p className="mb-4">Listo para realizar una venta</p>
+
+      {Object.keys(mensaje).length>0 && <Mensaje tipo={mensaje.tipo}>{mensaje.respuesta}</Mensaje>}
 
       {/* Botón para abrir el modal */}
       <button
         onClick={() => setMostrarModal(true)}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+        className="px-4 py-2 mb-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition" 
       >
         Crear Cliente
       </button>
@@ -79,15 +86,7 @@ const CajaDeVenta = () => {
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-md shadow-md w-96">
             <h2 className="text-2xl font-bold mb-4">Crear Cliente</h2>
-            {mensaje.respuesta && (
-              <p
-                className={`text-sm mb-4 ${
-                  mensaje.tipo ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {mensaje.respuesta}
-              </p>
-            )}
+
             <form onSubmit={agregarCliente} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -123,7 +122,13 @@ const CajaDeVenta = () => {
                   type="text"
                   name="cedula"
                   value={nuevoCliente.cedula}
-                  onChange={handleChange}
+                  maxLength="10"
+                  onChange={(e) => {
+                    // Validación para permitir solo números y un punto decimal
+                    if (/^\d*\.?\d{0}$/.test(e.target.value)) {
+                        handleChange(e);
+                    }
+                }}
                   className="w-full border p-2 rounded-md"
                   required
                 />
@@ -149,7 +154,13 @@ const CajaDeVenta = () => {
                   type="text"
                   name="telefono"
                   value={nuevoCliente.telefono}
-                  onChange={handleChange}
+                  maxLength="10"
+                  onChange={(e) => {
+                    // Validación para permitir solo números y un punto decimal
+                    if (/^\d*\.?\d{0}$/.test(e.target.value)) {
+                        handleChange(e);
+                    }
+                }}
                   className="w-full border p-2 rounded-md"
                   required
                 />
@@ -188,7 +199,7 @@ const CajaDeVenta = () => {
       )}
 
       {/* Componente Punto de Venta */}
-      <PuntoDeVenta clienteId={clienteId} />
+      <PuntoDeVenta/>
     </div>
   );
 };
