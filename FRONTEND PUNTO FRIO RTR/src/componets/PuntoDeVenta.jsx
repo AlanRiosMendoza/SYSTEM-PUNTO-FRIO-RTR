@@ -12,9 +12,14 @@ const PuntoDeVenta = () => {
   const [mensaje, setMensaje] = useState("");
   const [busqueda, setBusqueda] = useState(""); // Estado para el filtro de búsqueda
 
+   // Estados para manejar clientes
+  const [clientes, setClientes] = useState([]);
+  const [busquedaCliente, setBusquedaCliente] = useState("");
+  const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+
   // Cargar productos desde el backend
-useEffect(() => {
-  const cargarProductos = async () => {
+  useEffect(() => {
+    const cargarProductos = async () => {
     const token = localStorage.getItem("token");
     const url = `${import.meta.env.VITE_BACKEND_URL}/productos`;
     const options = {
@@ -34,49 +39,86 @@ useEffect(() => {
     }
   };
 
-  cargarProductos();
-}, []);
+    cargarProductos();
+  }, []);
 
   // Filtrar los productos según la búsqueda
   const productosFiltrados = productosDisponibles.filter((producto) =>
     producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
+  const buscarCliente = async (cedula) => {
+    try {
+      const token = localStorage.getItem("token");
+      const url = `${import.meta.env.VITE_BACKEND_URL}/clientes?cedula=${cedula}`;
+      const respuesta = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (respuesta.data && respuesta.data.length > 0) {
+        setClienteSeleccionado(respuesta.data[0]);
+        setMensaje("");
+      } else {
+        setMensaje("La cédula ingresada no corresponde a ningún cliente.");
+      }
+    } catch (error) {
+      console.error("Error al buscar cliente:", error);
+      setMensaje("Ocurrió un error al buscar el cliente.");
+    }
+  };
+
   // Agregar producto a la venta
   const agregarProducto = () => {
     const producto = productosDisponibles.find(
       (p) => p._id === productoSeleccionado
     );
-
+  
     if (!producto) {
       setMensaje("Producto no encontrado");
-      setTimeout(() => {
-        setMensaje("");
-    }, 3000);
+      setTimeout(() => setMensaje(""), 3000);
       return;
     }
-
+  
+    if (cantidad <= 0) {
+      setMensaje("La cantidad debe ser mayor a 0.");
+      return;
+    }
+  
     if (producto.stock < cantidad) {
-      setMensaje(`Stock insuficiente para ${producto.nombre}. Quedan ${producto.stock} unidades.`);
+      setMensaje(
+        `Stock insuficiente para ${producto.nombre}. Quedan ${producto.stock} unidades.`
+      );
       return;
     }
-
-    const nuevoProducto = {
-      producto_id: producto._id,
-      nombre: producto.nombre,
-      precio: producto.precio,
-      cantidad: cantidad,
-      subtotal: producto.precio * cantidad,
-    };
-
-    setProductosSeleccionados([...productosSeleccionados, nuevoProducto]);
-    setTotal(total + nuevoProducto.subtotal);
-
+  
+    const existente = productosSeleccionados.find(
+      (p) => p.producto_id === producto._id
+    );
+  
+    if (existente) {
+      // Si el producto ya está en la lista, solo actualiza la cantidad
+      existente.cantidad += cantidad;
+      existente.subtotal += cantidad * producto.precio;
+      setProductosSeleccionados([...productosSeleccionados]);
+    } else {
+      const nuevoProducto = {
+        producto_id: producto._id,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        cantidad: cantidad,
+        subtotal: producto.precio * cantidad,
+      };
+  
+      setProductosSeleccionados([...productosSeleccionados, nuevoProducto]);
+    }
+  
+    setTotal(total + cantidad * producto.precio);
+  
     // Resetear campos
     setProductoSeleccionado("");
     setCantidad(1);
     setMensaje("");
-    setBusqueda(""); // Limpiar la búsqueda después de agregar el producto
+    setBusqueda("");// Limpiar la búsqueda después de agregar el producto
   };
 
   // Eliminar producto
@@ -93,7 +135,7 @@ useEffect(() => {
 
   // Finalizar la venta
   const finalizarVenta = async () => {
-    if (!clienteId || productosSeleccionados.length === 0) {
+    if (!clienteSeleccionado || productosSeleccionados.length === 0) {
       setMensaje("Debe seleccionar un cliente y agregar al menos un producto.");
       return;
     }
@@ -108,7 +150,7 @@ useEffect(() => {
     };
 
     const ventaData = {
-      cliente_id: clienteId || null,
+      cliente_id: clienteSeleccionado._id,
       productos: productosSeleccionados.map((p) => ({
         producto_id: p.producto_id,
         cantidad: p.cantidad,
@@ -116,12 +158,12 @@ useEffect(() => {
     };
 
     try {
+      console.log(ventaData)
       await axios.post(url, ventaData, options);
       alert("Venta realizada con éxito.");
       setProductosSeleccionados([]);
       setTotal(0);
-      setClienteId("");
-      setMensaje(""); // Limpiar el mensaje
+      setClienteSeleccionado(null);
     } catch (error) {
       console.error("Error al realizar la venta:", error);
       setMensaje("Hubo un error al procesar la venta.");
@@ -135,6 +177,46 @@ useEffect(() => {
 
         {/* Mostrar mensaje */}
         {mensaje && <Mensaje tipo={false}>{mensaje}</Mensaje>}
+
+        {/* Selección de cliente */}
+        {!clienteSeleccionado ? (
+          <div>
+            <h3 className="text-xl font-bold mb-4">Buscar Cliente</h3>
+            <input
+              type="text"
+              placeholder="Ingrese la cédula del cliente..."
+              value={busquedaCliente}
+              onChange={(e) => setBusquedaCliente(e.target.value)}
+              className="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+            />
+            <button
+                onClick={() => buscarCliente(busquedaCliente)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              >
+                Buscar
+            </button>
+
+            {/* Mostrar mensaje si hay error */}
+            {mensaje && <p className="text-red-500 mt-4">{mensaje}</p>}
+          </div>
+        ) : (
+          <div>
+            <h3 className="text-xl font-bold mb-4">Cliente Seleccionado</h3>
+            <p>
+              <strong>Nombre:</strong> {clienteSeleccionado.nombre} {clienteSeleccionado.apellido}
+            </p>
+            <p>
+              <strong>Cédula:</strong> {clienteSeleccionado.cedula}
+            </p>
+            <button
+              onClick={() => setClienteSeleccionado(null)}
+              className="bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
+            >
+              Cambiar Cliente
+            </button>
+          </div>
+        )}
+
 
         {/* Barra de búsqueda para seleccionar producto */}
         <div className="mb-6">
