@@ -46,6 +46,13 @@ const PuntoDeVenta = () => {
   );
 
   const buscarCliente = async (cedula) => {
+
+    if (!cedula) {
+      setMensaje("Por favor, ingrese la cédula del cliente.");
+      setTimeout(() => setMensaje(""), 4000);
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const url = `${import.meta.env.VITE_BACKEND_URL}/clientes?cedula=${cedula}`;
@@ -60,6 +67,7 @@ const PuntoDeVenta = () => {
         setMensaje("Ocurrió un error al buscar el cliente.");
         setTimeout(() => setMensaje(""), 4000);
       }
+      setBusquedaCliente("")
     } catch (error) {
       console.error("Error al buscar cliente:", error);
       setMensaje("La cédula ingresada no corresponde a ningún cliente.");
@@ -213,7 +221,7 @@ const PuntoDeVenta = () => {
               <strong>Cédula:</strong> {clienteSeleccionado.cedula}
             </p>
             <button
-              onClick={() => setClienteSeleccionado(null)}
+              onClick={() => setClienteSeleccionado()}
               className="bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
             >
               Cambiar Cliente

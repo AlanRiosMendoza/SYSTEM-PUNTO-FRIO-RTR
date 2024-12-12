@@ -4,6 +4,7 @@ import axios from "axios";
 import Mensaje from "./Alertas/Mensaje";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthProvider";
+import Actualizar from "../paginas/Actualizar";
 
 const Tabla = () => {
     const { auth } = useContext(AuthContext);
@@ -14,6 +15,9 @@ const Tabla = () => {
     const [limite] = useState(10);
     const [ordenAscendente, setOrdenAscendente] = useState(true); // Estado para el orden de la tabla
     const [selectedFilter, setSelectedFilter] = useState("todos");
+
+    const [modalOpen, setModalOpen] = useState(false); // Estado del modal
+    const [productoSeleccionado, setProductoSeleccionado] = useState(null); // Producto a editar
 
     const listarProductos = async () => {
         try {
@@ -99,6 +103,16 @@ const Tabla = () => {
         setOrdenAscendente(!ordenAscendente); // Cambia el orden para el próximo clic
         setProductosFiltrados(productosOrdenados);
     };
+
+    const handleOpenModal = (producto) => {
+        setProductoSeleccionado(producto);
+        setModalOpen(true);
+      };
+    
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setProductoSeleccionado(null);
+      };
 
     useEffect(() => {
         listarProductos();
@@ -189,12 +203,7 @@ const Tabla = () => {
                                             <>
                                                 <MdUpdate
                                                     className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
-                                                    onClick={() =>
-                                                        navigate(
-                                                           `/dashboard/actualizar/${producto._id}`
-                                                        )
-                                                    }
-                                                    
+                                                    onClick={() => handleOpenModal(producto)}
                                                 />
                                                 <MdChangeCircle
                                                     className="h-7 w-7 text-red-400 cursor-pointer inline-block mr-2"
@@ -212,6 +221,14 @@ const Tabla = () => {
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Modal */}
+                    <Actualizar
+                        producto={productoSeleccionado}
+                        isOpen={modalOpen}
+                        onClose={handleCloseModal}
+                        onUpdate={listarProductos} // Refresca la lista después de actualizar
+                    />
 
                     {/* Control de paginación */}
                     <div className="flex justify-center mt-4">
