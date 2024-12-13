@@ -4,8 +4,8 @@ import axios from "axios";
 import Mensaje from "./Alertas/Mensaje";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthProvider";
-import Actualizar from "../paginas/Actualizar";
-import Visualizar from "../paginas/Visualizar"
+import Actualizar from "./Modals/Actualizar";
+import Visualizar from "./Modals/Visualizar"
 
 const Tabla = () => {
     const { auth } = useContext(AuthContext);

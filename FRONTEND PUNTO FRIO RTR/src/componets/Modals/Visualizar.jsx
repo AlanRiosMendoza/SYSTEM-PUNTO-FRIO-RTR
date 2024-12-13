@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import Mensaje from "../componets/Alertas/Mensaje";
+import Mensaje from "../Alertas/Mensaje";
 
 const Visualizar = ({ producto, isOpen, onClose, onUpdate }) => {
     const [cantidad, setCantidad] = useState("");

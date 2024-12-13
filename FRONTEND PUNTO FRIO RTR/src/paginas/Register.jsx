@@ -1,11 +1,12 @@
 import { useState } from "react"
 import Mensaje from '../componets/Alertas/Mensaje'
 import axios from "axios"
+import TablaUsuarios from "../componets/tablaUsuario"
 
 export const Register = () => {
 
     const [mensaje, setMensaje] = useState({})
-
+    const [mostrarTabla, setMostrarTabla] = useState(false); // Estado para alternar entre la tabla y el formulario
     const [form, setform] = useState({
         nombre:"",
         apellido:"",
@@ -117,21 +118,38 @@ export const Register = () => {
             
             <div className="bg-transparent flex justify-center items-baseline">
 
-                <div className="md:w-4/5 sm:w-full my-2">
+                <div className="w-full max-w-screen-md bg-white p-8 rounded-lg shadow-lg">
                 
                 {Object.keys(mensaje).length>0 && <Mensaje tipo={mensaje.tipo}>{mensaje.respuesta}</Mensaje>}
                 
-                    <h1 className="text-3xl font-semibold mb-2 text-center uppercase text-gray-700">Bienvenido</h1>
-                    <small className="text-gray-700 block my-4 text-sm">Ingresa los siguientes detalles</small>
+                {!mostrarTabla ? (
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <h1 className="text-2xl font-bold text-gray-800 uppercase">Registrar Usuario</h1>
+                            <button
+                                className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-md shadow"
+                                onClick={() => setMostrarTabla(true)} // Mostrar la tabla
+                            >
+                                Ver Usuarios
+                            </button>
+                        </div>
+
+                        <p className="text-gray-600 text-center mt-2">Completa los detalles para crear una cuenta</p>
 
 
-                    <form className="mx-2" onSubmit={handlerSubmit}>
+                    <form className="mt-6 space-y-4" onSubmit={handlerSubmit}>
 
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold text-gray-400" htmlFor="nombre">Nombre</label>
-                            <input type="name" 
-                            id="nombre" name="nombre" value={form.nombre || ""} onChange={handlerChange}
-                            placeholder="Ingresar nombre" className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" required/>
+                            <input 
+                                type="name" 
+                                id="nombre" 
+                                name="nombre" 
+                                value={form.nombre || ""} 
+                                onChange={handlerChange}
+                                placeholder="Ingresar nombre" 
+                                className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" 
+                                required/>
                         </div>
 
                         <div className="mb-3">
@@ -204,13 +222,31 @@ export const Register = () => {
                             </select>
                         </div>
                         
-                        <div className="mb-3">
-                            <button className="bg-gray-500 text-slate-300 border py-2 w-full rounded-xl mt-5 hover:scale-105 duration-300 hover:bg-gray-900 hover:text-white " >Registrar
+                        <div className="mb-3 text-center">
+                            <button 
+                            className="w-1/2 bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-base"
+                            >Registrar
                             </button>
                         </div>
 
                     </form>
+                </>
+                 ) : (
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <h1 className="text-2xl font-bold text-gray-800 uppercase">Usuarios Registrados</h1>
+                            <button
+                                className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-md shadow"
+                                onClick={() => setMostrarTabla(false)} // Volver al formulario
+                            >
+                                Volver
+                            </button>
+                        </div>
 
+                        {/* Renderizar la tabla de usuarios */}
+                        <TablaUsuarios />
+                    </>
+                )}
                 </div>
 
             </div>
