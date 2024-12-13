@@ -5,6 +5,7 @@ import Mensaje from "./Alertas/Mensaje";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthProvider";
 import Actualizar from "../paginas/Actualizar";
+import Visualizar from "../paginas/Visualizar"
 
 const Tabla = () => {
     const { auth } = useContext(AuthContext);
@@ -16,8 +17,11 @@ const Tabla = () => {
     const [ordenAscendente, setOrdenAscendente] = useState(true); // Estado para el orden de la tabla
     const [selectedFilter, setSelectedFilter] = useState("todos");
 
+    //modales
     const [modalOpen, setModalOpen] = useState(false); // Estado del modal
     const [productoSeleccionado, setProductoSeleccionado] = useState(null); // Producto a editar
+    const [visualizarModalOpen, setVisualizarModalOpen] = useState(false);
+    const [productoVisualizar, setProductoVisualizar] = useState(null);
 
     const listarProductos = async () => {
         try {
@@ -114,6 +118,16 @@ const Tabla = () => {
         setProductoSeleccionado(null);
       };
 
+    const handleOpenVisualizarModal = (producto) => {
+        setProductoVisualizar(producto);
+        setVisualizarModalOpen(true);
+    };
+
+    const handleCloseVisualizarModal = () => {
+        setVisualizarModalOpen(false);
+        setProductoVisualizar(null);
+    };
+
     useEffect(() => {
         listarProductos();
     }, [selectedFilter, pagina]); // Llamar listarProductos cuando el filtro cambie
@@ -192,11 +206,14 @@ const Tabla = () => {
                                     <td className="py-2 text-center">
                                         <MdInfo
                                             className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
-                                            onClick={() =>
-                                                navigate(
-                                                    `/dashboard/visualizar/${producto._id}`
-                                                )
-                                            }
+                                            onClick={() => handleOpenVisualizarModal(producto)}
+                                        />
+                                        {/* Modal Visualizar */}
+                                        <Visualizar
+                                            producto={productoVisualizar}
+                                            isOpen={visualizarModalOpen}
+                                            onClose={handleCloseVisualizarModal}
+                                            onUpdate={listarProductos} // Refresca la lista después de actualizar
                                         />
                                         
                                         {auth.rol === "administrador" && (

@@ -4,7 +4,7 @@ import axios from "axios";
 const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
     nombre: "",
-    stock: "",
+    descripcion: "",
     precio: "",
     retornable: false,
   });
@@ -13,7 +13,7 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
     if (producto && isOpen) {
       setFormData({
         nombre: producto.nombre || "",
-        stock: producto.stock || "",
+        descripcion: producto.descripcion || "",
         precio: producto.precio || "",
         retornable: producto.retornable || false,
       });
@@ -66,20 +66,18 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium">Stock</label>
-            <input
-              type="text"
-              name="stock"
-              value={formData.stock}
+            <label className="block text-sm font-medium">Descripción</label>
+            <textarea
+              name="descripcion"
+              value={formData.descripcion}
               onChange={handleChange}
               className="w-full p-2 border rounded"
-              required
-            ></input>
+            ></textarea>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium">Precio</label>
             <input
-              type="text"
+              type="number"
               name="precio"
               value={formData.precio}
               onChange={handleChange}

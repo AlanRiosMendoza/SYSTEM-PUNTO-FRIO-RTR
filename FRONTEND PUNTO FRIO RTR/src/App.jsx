@@ -43,9 +43,9 @@ function App() {
                 <Route element={<Dashboard/>}>
                   <Route index element={<Perfil/>}/>
                   <Route path='listar' element={<Listar/>}/>
-                  <Route path='visualizar/:id' element={<Visualizar/>}/>
+                  {/* <Route path='visualizar/:id' element={<Visualizar/>}/> */}
                   <Route path='crear' element={<Crear/>}/>
-                  <Route path='actualizar/:id' element={<Actualizar/>}/>
+                  {/* <Route path='actualizar/:id' element={<Actualizar/>}/> */}
                   <Route path='CajaDeVenta' element={<CajaDeVenta/>}/>
                   <Route path='register' element={<Register/>}/>
                 </Route>
