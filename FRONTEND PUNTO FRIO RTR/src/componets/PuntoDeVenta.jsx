@@ -183,7 +183,7 @@ const PuntoDeVenta = () => {
 
   return (
     <div>
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <div className="max-w-full mx-auto bg-white rounded-lg shadow-md p-6 ">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Punto de Venta</h2>
 
         {/* Mostrar mensaje */}
@@ -191,7 +191,7 @@ const PuntoDeVenta = () => {
 
         {/* Selección de cliente */}
         {!clienteSeleccionado ? (
-          <div>
+          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Buscar Cliente</h3>
             <input
               type="text"
@@ -212,7 +212,7 @@ const PuntoDeVenta = () => {
 
           </div>
         ) : (
-          <div>
+          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Cliente Seleccionado</h3>
             <p>
               <strong>Nombre:</strong> {clienteSeleccionado.nombre} {clienteSeleccionado.apellido}
@@ -232,7 +232,7 @@ const PuntoDeVenta = () => {
 
 
         {/* Barra de búsqueda para seleccionar producto */}
-        <div className="mb-6">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 mt-4">
           <label className="block text-xl font-bold mb-4 text-gray-700">
             Buscar Producto:
           </label>
@@ -285,7 +285,7 @@ const PuntoDeVenta = () => {
         )}
 
         {/* Lista de Productos Seleccionados */}
-        <table className="w-full text-left table-auto border-collapse mb-6">
+        <table className="w-full text-left table-auto border-collapse mb-6 mt-4">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
               <th className="px-4 py-2 border">Producto</th>

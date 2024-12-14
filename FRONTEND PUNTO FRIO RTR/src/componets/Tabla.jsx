@@ -2,14 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { MdChangeCircle, MdUpdate, MdInfo } from "react-icons/md";
 import axios from "axios";
 import Mensaje from "./Alertas/Mensaje";
-import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthProvider";
 import Actualizar from "./Modals/Actualizar";
 import Visualizar from "./Modals/Visualizar"
 
 const Tabla = () => {
     const { auth } = useContext(AuthContext);
-    const navigate = useNavigate();
     const [productos, setProductos] = useState([]);
     const [productosFiltrados, setProductosFiltrados] = useState([]);
     const [pagina, setPagina] = useState(1);

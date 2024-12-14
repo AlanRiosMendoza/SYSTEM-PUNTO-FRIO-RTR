@@ -44,6 +44,7 @@ const TablaUsuarios = () => {
             <th className="border border-gray-300 px-4 py-2">Nombre</th>
             <th className="border border-gray-300 px-4 py-2">Correo</th>
             <th className="border border-gray-300 px-4 py-2">Rol</th>
+            <th className="border border-gray-300 px-4 py-2">Ultimo acceso</th>
             <th className="border border-gray-300 px-4 py-2">Estado</th>
           </tr>
         </thead>
@@ -55,13 +56,16 @@ const TablaUsuarios = () => {
                   {(pagina - 1) * limite + index + 1}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {usuario.nombre}
+                  {usuario.nombre + " " +  usuario.apellido}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {usuario.correo}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   {usuario.rol}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {usuario.fechaUltimoAcceso}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {usuario.activo ? (
