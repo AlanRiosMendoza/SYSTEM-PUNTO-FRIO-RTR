@@ -118,7 +118,7 @@ export const Register = () => {
             
             <div className="bg-transparent flex justify-center items-baseline">
 
-                <div className="w-full max-w-screen-md bg-white p-8 rounded-lg shadow-lg">
+                <div className="w-full bg-white p-8 rounded-lg shadow-lg">
                 
                 {Object.keys(mensaje).length>0 && <Mensaje tipo={mensaje.tipo}>{mensaje.respuesta}</Mensaje>}
                 

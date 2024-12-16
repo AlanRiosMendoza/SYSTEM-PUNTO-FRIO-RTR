@@ -132,8 +132,8 @@ const Tabla = () => {
 
     return (
         <>
-             {/* Radios de filtro */}
-             <div className="flex justify-center items-center gap-4 mt-6">
+            {/* Radios de filtro */}
+            <div className="flex justify-center items-center gap-4 mt-6">
                 {["todos", "activos", "inactivos"].map((opcion) => (
                     <label
                         key={opcion}

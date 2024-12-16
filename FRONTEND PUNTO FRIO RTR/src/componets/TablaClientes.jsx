@@ -27,32 +27,36 @@ const TablaClientes = ({ setMostrarTabla }) => {
   return (
     <div className="bg-white p-6 rounded-md shadow-md">
       <h2 className="text-2xl font-bold mb-4">Clientes Registrados</h2>
-      <table className="min-w-full divide-y divide-gray-200 border">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-gray-200 border shadow-lg">
+        <thead className="bg-gray-800 text-slate-400">
           <tr>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="p-2">
+              N°
+            </th>
+            <th className="px-4 py-2 text-sm font-medium uppercase">
               Nombre
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="px-4 py-2 text-sm font-medium uppercase">
               Apellido
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="px-4 py-2 text-sm font-medium uppercase">
               Cédula
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="px-4 py-2 text-sm font-medium uppercase">
               Correo
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="px-4 py-2 text-sm font-medium uppercase">
               Teléfono
             </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className="px-4 py-2 text-sm font-medium uppercase">
               Dirección
             </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {clientes.map((cliente) => (
+          {clientes.map((cliente, index) => (
             <tr key={cliente._id}>
+              <td>{index + 1}</td>
               <td className="px-4 py-2">{cliente.nombre}</td>
               <td className="px-4 py-2">{cliente.apellido}</td>
               <td className="px-4 py-2">{cliente.cedula}</td>

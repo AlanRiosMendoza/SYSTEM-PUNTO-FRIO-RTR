@@ -37,15 +37,15 @@ const TablaUsuarios = () => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse border border-gray-200">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-300 px-4 py-2">#</th>
-            <th className="border border-gray-300 px-4 py-2">Nombre</th>
-            <th className="border border-gray-300 px-4 py-2">Correo</th>
-            <th className="border border-gray-300 px-4 py-2">Rol</th>
-            <th className="border border-gray-300 px-4 py-2">Ultimo acceso</th>
-            <th className="border border-gray-300 px-4 py-2">Estado</th>
+      <table className="w-full mt-5 table-auto shadow-lg bg-white">
+        <thead className="bg-gray-800 text-slate-400">
+          <tr>
+            <th className="p-2">#</th>
+            <th className="p-2">Nombre</th>
+            <th className="p-2">Correo</th>
+            <th className="p-2">Rol</th>
+            <th className="p-2">Ultimo acceso</th>
+            <th className="p-2">Estado</th>
           </tr>
         </thead>
         <tbody>

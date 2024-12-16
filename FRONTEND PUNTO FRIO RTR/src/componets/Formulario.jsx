@@ -118,7 +118,7 @@ export const Formulario = () => {
             setTimeout(() => {
                 setMensaje("");
                 navigate("/dashboard/listar");
-            }, 3000);
+            }, 4000);
         } catch (error) {
             console.error(error.response?.data || error.message);
             setMensaje({
@@ -128,7 +128,7 @@ export const Formulario = () => {
 
             setTimeout(() => {
                 setMensaje("");
-            }, 3000);
+            }, 4000);
         }
     };
 
