@@ -144,60 +144,59 @@ export const obtenerUsuario = async (req, res) => {
 }
 
 export const actualizarPerfil = async (req, res) => {
-  const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id)
+  try {
+    const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id);
 
-  const camposVaciosError = validarCamposVacios(req.body)
-  if (camposVaciosError)
-    return res.status(400).json({ msg: camposVaciosError.message })
+    const camposVaciosError = validarCamposVacios(req.body);
+    if (camposVaciosError)
+      return res.status(400).json({ msg: camposVaciosError.message });
 
-  if (req.body.correo && req.body.correo !== usuario.correo) {
-    const correoError = validarCorreoElectronico(req.body.correo)
-    if (correoError) return res.status(400).json({ msg: correoError.message })
+    if (req.body.correo && req.body.correo !== usuario.correo) {
+      const correoError = validarCorreoElectronico(req.body.correo);
+      if (correoError) return res.status(400).json({ msg: correoError.message });
 
-    const correoExistenteError = await validarCorreoExistente(req.body.correo)
-    if (correoExistenteError)
-      return res.status(400).json({ msg: correoExistenteError.message })
-    usuario.correo = req.body.correo
+      // Verificar si el correo pertenece a otro usuario
+      const correoExistente = await UsuarioSchema.findOne({ correo: req.body.correo });
+      if (correoExistente && correoExistente._id.toString() !== usuario._id.toString()) {
+        return res.status(400).json({ msg: 'Ya existe un usuario con ese correo' });
+      }
+
+      usuario.correo = req.body.correo;
+    }
+
+    if (req.body.cedula && req.body.cedula !== usuario.cedula) {
+      const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula');
+      if (cedulaError) return res.status(400).json({ msg: cedulaError.message });
+      usuario.cedula = req.body.cedula;
+    }
+
+    if (req.body.nombre && req.body.nombre !== usuario.nombre) {
+      const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre');
+      if (nombreError) return res.status(400).json({ msg: nombreError.message });
+      usuario.nombre = req.body.nombre;
+    }
+
+    if (req.body.apellido && req.body.apellido !== usuario.apellido) {
+      const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido');
+      if (apellidoError) return res.status(400).json({ msg: apellidoError.message });
+      usuario.apellido = req.body.apellido;
+    }
+
+    if (req.body.telefono && req.body.telefono !== usuario.telefono) {
+      const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono');
+      if (telefonoError) return res.status(400).json({ msg: telefonoError.message });
+      usuario.telefono = req.body.telefono;
+    }
+
+    await usuario.save();
+
+    res.status(200).json({ msg: 'Usuario actualizado' });
+  } catch (error) {
+    console.error("Error al actualizar el usuario:", error);
+    res.status(500).json({ msg: 'Error interno del servidor' });
   }
+};
 
-  if (req.body.cedula && req.body.cedula !== usuario.cedula) {
-    const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
-    if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
-    usuario.cedula = req.body.cedula
-  }
-
-  if (req.body.nombre && req.body.nombre !== usuario.nombre) {
-    const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre')
-    if (nombreError) return res.status(400).json({ msg: nombreError.message })
-    usuario.nombre = req.body.nombre
-  }
-
-  if (req.body.apellido && req.body.apellido !== usuario.apellido) {
-    const apellidoError = validarLongitudPalabra(
-      req.body.apellido,
-      2,
-      'apellido',
-    )
-    if (apellidoError)
-      return res.status(400).json({ msg: apellidoError.message })
-    usuario.apellido = req.body.apellido
-  }
-
-  if (req.body.telefono && req.body.telefono !== usuario.telefono) {
-    const telefonoError = validarLongitudNumero(
-      req.body.telefono,
-      10,
-      'teléfono',
-    )
-    if (telefonoError)
-      return res.status(400).json({ msg: telefonoError.message })
-    usuario.telefono = req.body.telefono
-  }
-
-  await usuario.save()
-
-  res.status(200).json({ msg: 'Usuario actualizado' })
-}
 
 export const recuperarPassword = async (req, res) => {
   const camposError = validarCamposVacios(req.body)

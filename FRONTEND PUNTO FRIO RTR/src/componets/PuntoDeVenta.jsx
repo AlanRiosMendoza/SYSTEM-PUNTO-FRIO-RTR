@@ -183,11 +183,11 @@ const PuntoDeVenta = () => {
 
   return (
     <div>
-      <div className="max-w-full mx-auto bg-white rounded-lg shadow-md p-6 ">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Punto de Venta</h2>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Punto de Venta</h2>
 
         {/* Mostrar mensaje */}
-        {mensaje && <Mensaje tipo={false}>{mensaje}</Mensaje>}
+        {mensaje && <Mensaje tipo={true}>{mensaje}</Mensaje>}
 
         {/* Selección de cliente */}
         {!clienteSeleccionado ? (
@@ -208,8 +208,6 @@ const PuntoDeVenta = () => {
                 Buscar
             </button>
 
-            <div className="w-full border-t-4 border-dashed border-lime-600 my-4"></div>
-
           </div>
         ) : (
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -226,7 +224,6 @@ const PuntoDeVenta = () => {
             >
               Cambiar Cliente
             </button>
-            <div className="w-full border-t-4 border-dashed border-lime-600 my-4"></div>
           </div>
         )}
 
@@ -285,9 +282,9 @@ const PuntoDeVenta = () => {
         )}
 
         {/* Lista de Productos Seleccionados */}
-        <table className="w-full text-left table-auto border-collapse mb-6 mt-4">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700">
+        <table className="w-full mt-5 mb-4 table-auto shadow-lg bg-white ">
+          <thead className="bg-gray-800 text-slate-400">
+            <tr>
               <th className="px-4 py-2 border">Producto</th>
               <th className="px-4 py-2 border">Cantidad</th>
               <th className="px-4 py-2 border">Precio Unitario</th>
@@ -298,11 +295,11 @@ const PuntoDeVenta = () => {
           <tbody>
             {productosSeleccionados.map((p) => (
               <tr key={p.producto_id}>
-                <td className="px-4 py-2 border">{p.nombre}</td>
-                <td className="px-4 py-2 border">{p.cantidad}</td>
-                <td className="px-4 py-2 border">${p.precio.toFixed(2)}</td>
-                <td className="px-4 py-2 border">${p.subtotal.toFixed(2)}</td>
-                <td className="px-4 py-2 border">
+                <td className="px-4 py-2 border text-center">{p.nombre}</td>
+                <td className="px-4 py-2 border text-center">{p.cantidad}</td>
+                <td className="px-4 py-2 border text-center">${p.precio.toFixed(2)}</td>
+                <td className="px-4 py-2 border text-center">${p.subtotal.toFixed(2)}</td>
+                <td className="px-4 py-2 border text-center">
                   <button
                     onClick={() => eliminarProducto(p.producto_id)}
                     className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"

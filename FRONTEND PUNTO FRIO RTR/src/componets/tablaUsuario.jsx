@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { MdChangeCircle } from "react-icons/md"; 
+import ActualizarUsuario from "./Modals/ActualizarUsuario";
 
 const TablaUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [pagina, setPagina] = useState(1);
   const [limite] = useState(10);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
 
   useEffect(() => {
     const obtenerUsuarios = async () => {
@@ -27,12 +32,32 @@ const TablaUsuarios = () => {
     obtenerUsuarios();
   }, [pagina]);
 
+  // Función para abrir el modal con el usuario seleccionado
+  const handleEditarUsuario = (usuario) => {
+    setUsuarioSeleccionado(usuario);
+    setModalOpen(true);
+  };
+
   const handlePaginaAnterior = () => {
     if (pagina > 1) setPagina(pagina - 1);
   };
 
   const handlePaginaSiguiente = () => {
     setPagina(pagina + 1);
+  };
+
+  // Función para refrescar usuarios después de actualización
+  const refrescarUsuarios = async () => {
+    const token = localStorage.getItem("token");
+    const respuesta = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/usuarios?page=${pagina}&limit=${limite}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    setUsuarios(respuesta.data);
   };
 
   return (
@@ -46,6 +71,7 @@ const TablaUsuarios = () => {
             <th className="p-2">Rol</th>
             <th className="p-2">Ultimo acceso</th>
             <th className="p-2">Estado</th>
+            <th className="p-2">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -73,6 +99,12 @@ const TablaUsuarios = () => {
                   ) : (
                     <span className="text-red-600">Inactivo</span>
                   )}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  <MdChangeCircle
+                    className="h-7 w-7 cursor-pointer inline-block text-blue-500 hover:text-blue-700"
+                    onClick={() => handleEditarUsuario(usuario)} // Abre el modal
+                  />
                 </td>
               </tr>
             ))
@@ -105,6 +137,13 @@ const TablaUsuarios = () => {
           Siguiente
         </button>
       </div>
+      {/* Modal para actualizar usuario */}
+      <ActualizarUsuario
+        usuario={usuarioSeleccionado}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onUpdate={refrescarUsuarios}
+      />
     </div>
   );
 };

@@ -25,7 +25,7 @@ const TablaClientes = ({ setMostrarTabla }) => {
   }, [pagina]);
 
   return (
-    <div className="bg-white p-6 rounded-md shadow-md">
+    <div>
       <h2 className="text-2xl font-bold mb-4">Clientes Registrados</h2>
       <table className="min-w-full divide-y divide-gray-200 border shadow-lg">
         <thead className="bg-gray-800 text-slate-400">
@@ -56,13 +56,13 @@ const TablaClientes = ({ setMostrarTabla }) => {
         <tbody className="bg-white divide-y divide-gray-200">
           {clientes.map((cliente, index) => (
             <tr key={cliente._id}>
-              <td>{index + 1}</td>
-              <td className="px-4 py-2">{cliente.nombre}</td>
-              <td className="px-4 py-2">{cliente.apellido}</td>
-              <td className="px-4 py-2">{cliente.cedula}</td>
-              <td className="px-4 py-2">{cliente.correo}</td>
-              <td className="px-4 py-2">{cliente.telefono}</td>
-              <td className="px-4 py-2">{cliente.direccion}</td>
+              <td className="px-4 py-2 text-center">{index + 1}</td>
+              <td className="px-4 py-2 text-center">{cliente.nombre}</td>
+              <td className="px-4 py-2 text-center">{cliente.apellido}</td>
+              <td className="px-4 py-2 text-center">{cliente.cedula}</td>
+              <td className="px-4 py-2 text-center">{cliente.correo}</td>
+              <td className="px-4 py-2 text-center">{cliente.telefono}</td>
+              <td className="px-4 py-2 text-center">{cliente.direccion}</td>
             </tr>
           ))}
         </tbody>
