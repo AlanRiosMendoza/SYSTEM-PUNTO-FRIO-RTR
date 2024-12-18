@@ -3,11 +3,26 @@ import PuntoDeVenta from "../componets/PuntoDeVenta";
 import CrearCliente from "../componets/Modals/CrearCliente";
 import TablaClientes from "../componets/TablaClientes";
 import GestionEnvases from "../componets/Modals/GestionEnvases";
+import Factura from "../componets/Factura"; // Importa el componente Factura
 
 const CajaDeVenta = () => {
   const [mostrarModal, setMostrarModal] = useState(false); // Controla el modal
   const [mostrarTabla, setMostrarTabla] = useState(false); // Controla la tabla de clientes
   const [mostrarEnvases, setMostrarEnvases] = useState(false); // Controla la gestión de envases
+  const [mostrarFactura, setMostrarFactura] = useState(false); // Controla la visualización de la factura
+  const [ventaId, setVentaId] = useState(null); // ID de la venta que se va a mostrar
+
+  // Función para manejar la visualización de la factura
+  const verFactura = (id) => {
+    setVentaId(id); // Asignar el ID de la venta que se quiere mostrar
+    setMostrarFactura(true); // Activar la visualización de la factura
+  };
+
+  // Función para ocultar la factura
+  const ocultarFactura = () => {
+    setMostrarFactura(false);
+    setVentaId(null); // Limpiar el estado de ventaId
+  };
 
   return (
     <div>
@@ -50,6 +65,14 @@ const CajaDeVenta = () => {
         >
           {mostrarEnvases ? "Cajero" : "Gestionar Envases"}
         </button>
+
+        {/* Botón para ver factura */}
+        <button
+          onClick={() => verFactura('12345')} // Este ID es un ejemplo, reemplázalo con el ID real de la venta
+          className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
+        >
+          Ver Factura
+        </button>
       </div>
 
       {/* Modal para crear cliente */}
@@ -65,6 +88,19 @@ const CajaDeVenta = () => {
         <TablaClientes setMostrarTabla={setMostrarTabla} />
       ) : (
         <PuntoDeVenta />
+      )}
+
+      {/* Mostrar la factura si el estado 'mostrarFactura' es true */}
+      {mostrarFactura && <Factura ventaId={ventaId} />}
+
+      {/* Botón para ocultar la factura */}
+      {mostrarFactura && (
+        <button
+          onClick={ocultarFactura}
+          className="px-4 py-2 mt-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+        >
+          Cerrar Factura
+        </button>
       )}
     </div>
   );
