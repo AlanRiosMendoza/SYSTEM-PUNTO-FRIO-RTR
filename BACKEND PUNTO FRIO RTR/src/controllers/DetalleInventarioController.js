@@ -1,17 +1,17 @@
 import moment from 'moment-timezone'
-import DetalleInventarioSchema from '../models/DetalleInventario.js'
+import detalleInventarioSchema from '../models/DetalleInventario.js'
 import {
   validarObjectId,
   validarSiExisten,
 } from '../validators/ComunValidators.js'
-import ProductoSchema from '../models/Producto.js'
+import productoSchema from '../models/Producto.js'
 
 export const crearDetalleInventario = async (req, res) => {
   const { id: usuarioId } = req.UsuarioSchema
   const idError = validarObjectId(req.body.producto_id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const producto = await ProductoSchema.findById(req.body.producto_id)
+  const producto = await productoSchema.findById(req.body.producto_id)
 
   const ExistenciaError = validarSiExisten(producto, 'producto')
   if (ExistenciaError)
@@ -20,7 +20,7 @@ export const crearDetalleInventario = async (req, res) => {
   producto.stock += parseInt(req.body.cantidad)
   await producto.save()
 
-  const nuevoDetalleInventario = new DetalleInventarioSchema(req.body)
+  const nuevoDetalleInventario = new detalleInventarioSchema(req.body)
   nuevoDetalleInventario.usuario_id = usuarioId
   nuevoDetalleInventario.tipo_movimiento = 'Entrada'
   await nuevoDetalleInventario.save()
@@ -34,7 +34,7 @@ export const obtenerDetalleInventario = async (req, res) => {
 
   const skip = (pagina - 1) * limite
 
-  const detalleInventario = await DetalleInventarioSchema.find()
+  const detalleInventario = await detalleInventarioSchema.find()
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limite)
@@ -66,7 +66,7 @@ export const obtenerDetalleInventarioPorId = async (req, res) => {
   const idError = validarObjectId(req.params.id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
-  const detalleInventario = await DetalleInventarioSchema.findById(
+  const detalleInventario = await detalleInventarioSchema.findById(
     req.params.id,
   )
     .select('_id cantidad fecha descripcion tipo_movimiento')
