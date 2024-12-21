@@ -8,16 +8,13 @@ import { Forgot } from './paginas/Forgot'
 import { NotFound } from './paginas/NotFound'
 import Dashboard from './layout/Dashboard'
 import Listar from './paginas/Listar'
-import Visualizar from './componets/Modals/Visualizar'
 import Crear from './paginas/Crear'
-import Actualizar from './componets/Modals/Actualizar'
 import Perfil from './paginas/Perfil'
 import { Confirmar } from './paginas/Confirmar'
 import CajaDeVenta from './paginas/CajaDeVenta'
 
 import { AuthProvider } from './context/AuthProvider'
 import { PrivateRoute } from './routes/privateRoutes'
-
 import RoleBasedRoute from './context/RoleBasedRoute'
 
 function App() {
@@ -28,14 +25,14 @@ function App() {
         
         <Routes>
           
+          <Route index element={<LandinPage/>}/> 
+
           <Route path='/' element={<Auth/>}>
-            <Route index element={<LandinPage/>}/> 
             <Route path='login' element={<Login/>}/>          
             <Route path='forgot/:id' element={<Forgot/>}/>
             <Route path='confirmar/:token' element={<Confirmar/>}/>
             <Route path='*' element={<NotFound />} />
           </Route>
-
 
           <Route path='dashboard/*' element = {
             <PrivateRoute>
@@ -43,11 +40,17 @@ function App() {
                 <Route element={<Dashboard/>}>
                   <Route index element={<Perfil/>}/>
                   <Route path='listar' element={<Listar/>}/>
-                  {/* <Route path='visualizar/:id' element={<Visualizar/>}/> */}
-                  <Route path='crear' element={<Crear/>}/>
-                  {/* <Route path='actualizar/:id' element={<Actualizar/>}/> */}
                   <Route path='CajaDeVenta' element={<CajaDeVenta/>}/>
-                  <Route path='register' element={<Register/>}/>
+                  <Route path='crear' element={
+                    <RoleBasedRoute>
+                      <Crear/>
+                    </RoleBasedRoute>
+                    }/>
+                  <Route path='register' element={
+                    <RoleBasedRoute>
+                      <Register/>
+                    </RoleBasedRoute> 
+                    }/>
                 </Route>
               </Routes>
             </PrivateRoute>

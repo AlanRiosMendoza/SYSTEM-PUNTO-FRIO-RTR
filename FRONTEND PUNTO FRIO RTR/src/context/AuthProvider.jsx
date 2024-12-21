@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState({});
-    const [loading, setLoading] = useState(true); // Nuevo estado de carga
+    const [loading, setLoading] = useState(true);
 
     const perfil = async (token) => {
         try {
@@ -17,11 +17,11 @@ const AuthProvider = ({ children }) => {
                 },
             };
             const respuesta = await axios.get(url, options);
-            setAuth(respuesta.data);
+            setAuth(respuesta.data); // Aquí incluimos toda la info del usuario
         } catch (error) {
             console.log(error);
         } finally {
-            setLoading(false); // Aseguramos que se termina de cargar
+            setLoading(false);
         }
     };
 
@@ -30,7 +30,7 @@ const AuthProvider = ({ children }) => {
         if (token) {
             perfil(token);
         } else {
-            setLoading(false); // Si no hay token, terminamos de cargar
+            setLoading(false);
         }
     }, []);
 
@@ -61,7 +61,7 @@ const AuthProvider = ({ children }) => {
                 headers: {
                     method: 'PUT',
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: Bearer `${token}`
                 }
             }
             const respuesta = await axios.put(url, datos, options)
@@ -72,19 +72,21 @@ const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={
-            {
+        <AuthContext.Provider
+            value={{
                 auth,
                 setAuth,
                 actualizarPerfil,
                 actualizarPassword,
-                loading              
-            }
-        }>
+                loading,
+                role: auth.role, // Exponemos el rol directamente
+            }}
+        >
             {children}
         </AuthContext.Provider>
-    )
+    );
 };
+
 
 export { AuthProvider };
 export default AuthContext;
