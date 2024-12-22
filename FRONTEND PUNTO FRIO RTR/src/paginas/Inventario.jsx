@@ -3,58 +3,51 @@ import axios from 'axios';
 
 const Inventario = () => {
   const [detalleInventarios, setDetalleInventarios] = useState([]);
-  const [pagina, setPagina] = useState(1);
+  const [pagina, setPagina] = useState(1); // Página actual
   const [limite, setLimite] = useState(10);
+  const [hayMas, setHayMas] = useState(true); // Indica si hay más datos
   const [loading, setLoading] = useState(true);
   const [mensajeError, setMensajeError] = useState('');
-  const [totalRegistros, setTotalRegistros] = useState(0);
 
-  const obtenerToken = () => {
-    return localStorage.getItem('token');
-  };
 
+  // Función para obtener los detalles del inventario con paginación
   const obtenerDetalleInventario = async () => {
     setLoading(true);
     try {
-      const token = obtenerToken();
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/inventarios`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          pagina,
-          limite,
-        },
-      });
+      const token = localStorage.getItem('token');;
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/inventarios?pagina=${pagina}&limite=${limite}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      console.log('Respuesta del backend:', response.data);
-
-      // Ajustar las claves según lo recibido del backend
-      setDetalleInventarios(response.data.inventario || response.data || []);
-      setTotalRegistros(response.data.total || 0);
+      setDetalleInventarios(response.data || []); // Lista actualizada
+      setHayMas(response.data.length === limite); // Verificar si hay más registros
+      setMensajeError(''); // Limpia errores previos si los hubo
+      setLoading(false);
     } catch (error) {
       setMensajeError('Hubo un error al obtener los detalles del inventario');
       console.error('Error:', error);
       setDetalleInventarios([]);
-    } finally {
       setLoading(false);
     }
   };
 
+  // Efecto para cargar datos al cambiar de página
   useEffect(() => {
     obtenerDetalleInventario();
   }, [pagina, limite]);
 
-  const handlePaginaSiguiente = () => {
-    if (pagina * limite < totalRegistros) {
-      setPagina(pagina + 1);
+  // Manejo de botones de paginación
+  const manejarPaginaSiguiente = () => {
+    if (hayMas) {
+      setPagina((prevPagina) => prevPagina + 1);
     }
   };
 
-  const handlePaginaAnterior = () => {
-    if (pagina > 1) {
-      setPagina(pagina - 1);
-    }
+  const manejarPaginaAnterior = () => {
+    if (pagina > 1) setPagina((prevPagina) => prevPagina - 1);
   };
 
   return (
@@ -103,21 +96,24 @@ const Inventario = () => {
             </tbody>
           </table>
 
-          <div className="mt-4 flex justify-between">
+          {/* Botones de paginación */}
+          <div className="flex justify-between mt-4">
             <button
-              onClick={handlePaginaAnterior}
+              className={`px-4 py-2 rounded bg-blue-500 text-white ${
+                pagina === 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              onClick={manejarPaginaAnterior}
               disabled={pagina === 1}
-              className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-300"
             >
               Anterior
             </button>
-            <p>
-              Página {pagina} de {Math.ceil(totalRegistros / limite)}
-            </p>
+            <span>Página {pagina}</span>
             <button
-              onClick={handlePaginaSiguiente}
-              disabled={pagina * limite >= totalRegistros}
-              className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-300"
+              onClick={manejarPaginaSiguiente}
+              disabled={!hayMas}
+              className={`px-4 py-2 rounded bg-blue-500 text-white ${
+                !hayMas ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Siguiente
             </button>

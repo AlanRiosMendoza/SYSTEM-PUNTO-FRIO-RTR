@@ -11,6 +11,7 @@ const Tabla = () => {
     const [productos, setProductos] = useState([]);
     const [productosFiltrados, setProductosFiltrados] = useState([]);
     const [pagina, setPagina] = useState(1);
+    const [hayMas, setHayMas] = useState(true); // Indica si hay más datos
     const [limite] = useState(10);
     const [ordenAscendente, setOrdenAscendente] = useState(true); // Estado para el orden de la tabla
     const [selectedFilter, setSelectedFilter] = useState("todos");
@@ -24,39 +25,53 @@ const Tabla = () => {
     const listarProductos = async () => {
         try {
             const token = localStorage.getItem("token");
-            let url = `${import.meta.env.VITE_BACKEND_URL}/productos`;
-
-            // Añadimos el filtro al URL si está definido
+            const params = new URLSearchParams({
+                pagina,
+                limite,
+            });
+    
+            // Añadimos el filtro al parámetro si está definido
             if (selectedFilter === "activos") {
-                url += "?estado=true";
+                params.append("estado", "true");
             } else if (selectedFilter === "inactivos") {
-                url += "?estado=false";
+                params.append("estado", "false");
             }
-
+    
+            const url = `${import.meta.env.VITE_BACKEND_URL}/productos?${params.toString()}`;
+    
             const options = {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
             };
+    
             const respuesta = await axios.get(url, options);
+    
             console.log("Productos desde el backend:", respuesta.data);
+    
             setProductos(respuesta.data);
             setProductosFiltrados(respuesta.data);
+    
+            // Actualizar estado `hayMas`
+            setHayMas(respuesta.data.length === limite);
+    
         } catch (error) {
             console.error(
                 "Error al listar productos:",
                 error.response?.data || error.message
             );
+            setHayMas(false);
         }
     };
+    
 
     const handlePaginaAnterior = () => {
         if (pagina > 1) setPagina((prev) => prev - 1);
     };
 
     const handlePaginaSiguiente = () => {
-        setPagina((prev) => prev + 1);
+        if (hayMas) setPagina((prevPagina) => prevPagina + 1);
     };
 
     const handleDelete = async (id, activo) => {
@@ -128,7 +143,7 @@ const Tabla = () => {
 
     useEffect(() => {
         listarProductos();
-    }, [selectedFilter, pagina]); // Llamar listarProductos cuando el filtro cambie
+    }, [selectedFilter, pagina, limite]); // Llamar listarProductos cuando el filtro cambie
 
     return (
         <>
@@ -183,7 +198,7 @@ const Tabla = () => {
                                     className="border-b hover:bg-gray-300 text-center"
                                     key={producto._id}
                                 >
-                                    <td>{index + 1}</td>
+                                    <td>{(pagina - 1) * limite + index + 1}</td>
                                     <td>{producto.nombre}</td>
                                     <td>{producto.precio}</td>
                                     <td>{producto.stock}</td>
@@ -263,7 +278,12 @@ const Tabla = () => {
                         </span>
                         <button
                             onClick={handlePaginaSiguiente}
-                            className="px-4 py-2 border rounded-r bg-gray-800 text-white hover:bg-gray-700"
+                            disabled={!hayMas}
+                            className={`px-4 py-2 border rounded-r ${
+                                !hayMas
+                                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                    : "bg-gray-800 text-white hover:bg-gray-700"
+                            }`}
                         >
                             Siguiente
                         </button>
