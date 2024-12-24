@@ -10,6 +10,7 @@ const Factura = () => {
   const [error, setError] = useState(null);
   const [pagina, setPagina] = useState(1); // Página actual
   const [hayMas, setHayMas] = useState(true); // Indica si hay más ventas
+  const [limite] = useState(10)
 
   // Obtener todas las ventas con paginación
   useEffect(() => {
@@ -23,12 +24,9 @@ const Factura = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        const ventasOrdenadas = response.data.sort(
-          (a, b) => new Date(b.fecha) - new Date(a.fecha)
-        );
-
-        setVentas(ventasOrdenadas);
-        setHayMas(response.data.length > 0); // Verificar si hay más datos
+        
+        setVentas(response.data);
+        setHayMas(response.data.length === limite); // Verificar si hay más datos
         setCargando(false);
       } catch (error) {
         setError("Error al cargar las ventas.");
@@ -70,7 +68,6 @@ const Factura = () => {
     }
   };
 
-  // Función para generar PDF
   // Función para generar PDF estilizado
   const imprimirFactura = () => {
     const doc = new jsPDF();
@@ -145,22 +142,24 @@ const Factura = () => {
     return (
       <div className="max-w-4xl mx-auto p-8">
         <h1 className="text-2xl font-bold text-center mb-6">Lista de Ventas</h1>
-        <table className="w-full border-collapse border border-gray-300 text-sm mb-4">
-          <thead>
+        <table className="w-full mt-5 table-auto shadow-lg bg-white">
+          <thead className="bg-gray-800 text-slate-400">
             <tr>
-              <th className="border border-gray-300 px-2 py-1">Número de Venta</th>
-              <th className="border border-gray-300 px-2 py-1">Fecha</th>
-              <th className="border border-gray-300 px-2 py-1">Total</th>
-              <th className="border border-gray-300 px-2 py-1">Acción</th>
+              <th className="p-2">N°</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Número de Venta</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Fecha</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Total</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Acción</th>
             </tr>
           </thead>
           <tbody>
-            {ventas.map((venta) => (
+            {ventas.map((venta, index) => (
               <tr key={venta._id}>
-                <td className="border border-gray-300 px-2 py-1 text-center">{venta._id}</td>
-                <td className="border border-gray-300 px-2 py-1 text-center">{venta.fecha}</td>
-                <td className="border border-gray-300 px-2 py-1 text-right">${venta.total.toFixed(2)}</td>
-                <td className="border border-gray-300 px-2 py-1 text-center">
+                <td className="border border-gray-300 p-2 text-center">{(pagina - 1) * limite + index + 1}</td>
+                <td className="border border-gray-300 p-2 text-center">{venta._id}</td>
+                <td className="border border-gray-300 p-2 text-center">{venta.fecha}</td>
+                <td className="border border-gray-300 p-2 text-center">${venta.total.toFixed(2)}</td>
+                <td className="border border-gray-300 p-2 text-center">
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700"
                     onClick={() => obtenerVentaPorId(venta._id)}
@@ -174,7 +173,7 @@ const Factura = () => {
         </table>
 
         {/* Botones de Navegación */}
-        <div className="flex justify-between">
+        <div className="flex justify-center mt-4">
           <button
             className={`px-4 py-2 rounded bg-blue-500 text-white ${
               pagina === 1 ? "opacity-50 cursor-not-allowed" : ""
@@ -184,6 +183,9 @@ const Factura = () => {
           >
             Anterior
           </button>
+          <span className="px-4 py-2 border-t border-b text-gray-700 font-medium">
+              {pagina}
+          </span>
           <button
             className={`px-4 py-2 rounded bg-blue-500 text-white ${
               !hayMas ? "opacity-50 cursor-not-allowed" : ""
@@ -200,7 +202,7 @@ const Factura = () => {
 
   // Mostrar la factura de la venta seleccionada
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 shadow-lg rounded-md">
+    <div className="max-w-2xl mx-auto bg-white p-8 shadow-lg rounded-md mt-4">
       <button
         className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-700 mb-4"
         onClick={() => setVentaSeleccionada(null)}

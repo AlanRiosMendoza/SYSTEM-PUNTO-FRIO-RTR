@@ -28,7 +28,7 @@ const Listar = () => {
             onClick={toggleVista}
             className="bg-blue-500 text-white p-2 rounded mt-4"
           >
-            {mostrarInventario ? 'Ver Tabla de Productos' : 'Ver Inventario'}
+            {mostrarInventario ? 'Ver Tabla de Productos' : 'Informe y movimientos'}
           </button>
 
           {/* Mostrar la vista de Inventario si el estado es verdadero, sino mostrar la tabla */}

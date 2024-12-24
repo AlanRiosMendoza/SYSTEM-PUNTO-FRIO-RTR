@@ -183,7 +183,7 @@ const PuntoDeVenta = () => {
 
   return (
     <div>
-      <div>
+      <div className="max-w-4xl mx-auto p-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Punto de Venta</h2>
 
         {/* Mostrar mensaje */}
@@ -282,7 +282,7 @@ const PuntoDeVenta = () => {
         )}
 
         {/* Lista de Productos Seleccionados */}
-        <table className="w-full mt-5 mb-4 table-auto shadow-lg bg-white ">
+        <table className="w-full mt-5 table-auto shadow-lg bg-white">
           <thead className="bg-gray-800 text-slate-400">
             <tr>
               <th className="px-4 py-2 border">Producto</th>
