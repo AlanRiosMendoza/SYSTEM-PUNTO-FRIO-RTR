@@ -4,18 +4,21 @@ import axios from "axios";
 const TablaClientes = ({ setMostrarTabla }) => {
   const [clientes, setClientes] = useState([]);
   const [pagina, setPagina] = useState(1); // Controla la paginación
+  const [limite] = useState(10)
+  const [hayMas, setHayMas] = useState(true)
 
   useEffect(() => {
     const obtenerClientes = async () => {
       try {
         const token = localStorage.getItem("token");
-        const url = `${import.meta.env.VITE_BACKEND_URL}/clientes?pagina=${pagina}&limite=10`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/clientes?pagina=${pagina}&limite=${limite}`;
         const respuesta = await axios.get(url, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setClientes(respuesta.data);
+        setClientes(respuesta.data);    
+        setHayMas(respuesta.data.length === limite);
       } catch (error) {
         console.error("Error al obtener los clientes", error);
       }
@@ -23,6 +26,14 @@ const TablaClientes = ({ setMostrarTabla }) => {
 
     obtenerClientes();
   }, [pagina]);
+
+  const handlePaginaAnterior = () => {
+    if (pagina > 1) setPagina((prev) => prev - 1);
+};
+
+  const handlePaginaSiguiente = () => {
+    if (hayMas) setPagina((prevPagina) => prevPagina + 1);
+};
 
   return (
     <div>
@@ -56,7 +67,7 @@ const TablaClientes = ({ setMostrarTabla }) => {
         <tbody className="bg-white divide-y divide-gray-200">
           {clientes.map((cliente, index) => (
             <tr key={cliente._id}>
-              <td className="px-4 py-2 text-center">{index + 1}</td>
+              <td className="px-4 py-2 text-center">{(pagina - 1) * limite + index + 1}</td>
               <td className="px-4 py-2 text-center">{cliente.nombre}</td>
               <td className="px-4 py-2 text-center">{cliente.apellido}</td>
               <td className="px-4 py-2 text-center">{cliente.cedula}</td>
@@ -67,25 +78,32 @@ const TablaClientes = ({ setMostrarTabla }) => {
           ))}
         </tbody>
       </table>
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={() => setPagina((prev) => Math.max(prev - 1, 1))}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
-        >
-          Anterior
-        </button>
-        <button
-          onClick={() => setPagina((prev) => prev + 1)}
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
-        >
-          Siguiente
-        </button>
-        <button
-          onClick={() => setMostrarTabla(false)}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-        >
-          Cerrar
-        </button>
+        <div className="flex justify-center mt-4">
+          <button
+              onClick={handlePaginaAnterior}
+              disabled={pagina === 1}
+              className={`px-4 py-2 border rounded-l ${
+                  pagina === 1
+                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      : "bg-gray-800 text-white hover:bg-gray-700"
+              }`}
+          >
+              Anterior
+          </button>
+          <span className="px-4 py-2 border-t border-b text-gray-700 font-medium">
+              {pagina}
+          </span>
+          <button
+              onClick={handlePaginaSiguiente}
+              disabled={!hayMas}
+              className={`px-4 py-2 border rounded-r ${
+                  !hayMas
+                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      : "bg-gray-800 text-white hover:bg-gray-700"
+              }`}
+          >
+              Siguiente
+          </button>
       </div>
     </div>
   );

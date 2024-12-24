@@ -140,7 +140,7 @@ export const Formulario = () => {
                         {mensaje.respuesta}
                     </Mensaje>
                 )}
-
+            <h2 className="text-2xl font-bold mb-4">Ingreso de productos</h2>
                 <div>
                     <label
                         htmlFor="nombre"
