@@ -43,7 +43,7 @@ export const obtenerProductos = async (req, res) => {
   const productos = await ProductoSchema.find(filtro)
     .skip(skip)
     .limit(limite)
-    .select('_id nombre descripcion precio retornable stock')
+    .select('_id nombre descripcion precio activo retornable stock')
     .populate('categoria_id', 'nombre')
 
   const ExistenciaError = validarSiExisten(productos, 'productos')
@@ -71,38 +71,42 @@ export const obtenerProducto = async (req, res) => {
 }
 
 export const actualizarProducto = async (req, res) => {
-  const idError = validarObjectId(req.params.id)
-  if (idError) return res.status(400).json({ msg: idError.message })
+  const idError = validarObjectId(req.params.id);
+  if (idError) return res.status(400).json({ msg: idError.message });
 
-  const producto = await ProductoSchema.findById(req.params.id)
+  const producto = await ProductoSchema.findById(req.params.id);
 
-  const ExistenciaError = validarSiExisten(producto, 'productos')
+  const ExistenciaError = validarSiExisten(producto, 'productos');
   if (ExistenciaError)
     return res
       .status(404)
-      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` })
+      .json({ msg: `No se encontró ese producto con ese ID: ${req.params.id}` });
 
   if (req.body.nombre && req.body.nombre !== producto.nombre) {
     const nombreError = await validarNombreUnico(
       req.body.nombre,
       'producto',
       req.params.id,
-    )
-    if (nombreError) return res.status(400).json({ msg: nombreError.message })
-    producto.nombre = req.body.nombre
+    );
+    if (nombreError) return res.status(400).json({ msg: nombreError.message });
+    producto.nombre = req.body.nombre;
   }
 
   if (req.body.categoria_id && req.body.categoria_id !== producto.categoria_id)
-    producto.categoria_id = req.body.categoria_id
+    producto.categoria_id = req.body.categoria_id;
   if (req.body.precio && req.body.precio !== producto.precio)
-    producto.precio = req.body.precio
-  if (req.body.retornable && req.body.retornable !== producto.retornable)
-    producto.retornable = req.body.retornable
+    producto.precio = req.body.precio;
 
-  await producto.save()
+  // Aquí está la corrección:
+  if (req.body.hasOwnProperty('retornable') && req.body.retornable !== producto.retornable) {
+    producto.retornable = req.body.retornable;
+  }
 
-  res.status(200).json({ msg: 'Producto actualizado' })
-}
+  await producto.save();
+
+  res.status(200).json({ msg: 'Producto actualizado' });
+};
+
 
 export const desactivarProducto = async (req, res) => {
   const idError = validarObjectId(req.params.id)
