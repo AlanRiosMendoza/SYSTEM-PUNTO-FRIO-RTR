@@ -15,6 +15,8 @@ import {
   validarRol,
   validarSiExisten,
 } from '../validators/ComunValidators.js'
+import moment from 'moment-timezone'
+
 
 export const registro = async (req, res) => {
   const camposVaciosError = validarCamposVacios(req.body)
@@ -123,7 +125,17 @@ export const obtenerUsuarios = async (req, res) => {
     return res.status(404).json({ msg: ExistenciaError.message })
   }
 
-  res.status(200).json(usuarios)
+  const usuariosObjeto = usuarios.map((usuario) => {
+    const fechaEcuador = moment(usuario.fechaUltimoAcceso)
+      .tz('America/Guayaquil')
+      .format('YYYY-MM-DD HH:mm:ss')
+    return {
+      ...usuario.toObject(),
+      fechaUltimoAcceso: fechaEcuador,
+    }
+  })
+
+  res.status(200).json(usuariosObjeto)
 }
 
 export const obtenerUsuario = async (req, res) => {

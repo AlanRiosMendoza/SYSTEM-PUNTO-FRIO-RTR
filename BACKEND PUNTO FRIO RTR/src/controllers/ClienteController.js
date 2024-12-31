@@ -1,11 +1,9 @@
 import ClienteSchema from '../models/Cliente.js'
 import {
-  validarActivado,
   validarCamposVacios,
   validarCedulaUnica,
   validarCorreoElectronico,
   validarCorreoExistente,
-  validarDesactivado,
   validarLongitudNumero,
   validarObjectId,
   validarSiExisten,
