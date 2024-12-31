@@ -31,7 +31,6 @@ function App() {
           <Route path='/' element={<Auth/>}>
             <Route path='login' element={<Login/>}/>          
             <Route path='forgot/:id' element={<Forgot/>}/>
-            <Route path='confirmar/:token' element={<Confirmar/>}/>
             <Route path='recuperar-password/:token' element={<Restablecer/>}/>
             <Route path='*' element={<NotFound />} />
           </Route>

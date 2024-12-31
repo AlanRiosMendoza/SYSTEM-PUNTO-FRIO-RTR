@@ -231,6 +231,20 @@ export const recuperarPassword = async (req, res) => {
   res.status(200).json({ msg: 'Correo enviado' })
 }
 
+export const validarToken = async (req, res) => {
+  try {
+    const usuario = await UsuarioSchema.findOne({ token: req.params.token });
+
+    if (!usuario) {
+      return res.status(404).json({ msg: 'Token no válido o expirado' });
+    }
+
+    res.status(200).json({ msg: 'Token válido' });
+  } catch (error) {
+    res.status(500).json({ msg: 'Error del servidor' });
+  }
+}
+
 export const nuevoPassword = async (req, res) => {
   const camposError = validarCamposVacios(req.body)
   if (camposError) return res.status(400).json({ msg: camposError.message })

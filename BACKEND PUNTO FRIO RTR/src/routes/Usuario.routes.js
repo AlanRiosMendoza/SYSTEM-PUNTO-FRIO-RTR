@@ -6,6 +6,7 @@ import {
   obtenerUsuario,
   actualizarPerfil,
   recuperarPassword,
+  validarToken,
   nuevoPassword,
   perfil,
   actualizarPassword,
@@ -27,6 +28,7 @@ router.get('/usuario/:id', verificarAdministrador, obtenerUsuario)
 router.get('/perfil', verificarAutenticacion, perfil)
 router.put('/perfil', verificarAutenticacion, actualizarPerfil)
 router.post('/recuperar-password', recuperarPassword)
+router.get('/nuevo-password/:token', validarToken)
 router.post('/nuevo-password/:token', nuevoPassword)
 router.put('/actualizar-password', verificarAutenticacion, actualizarPassword)
 router.put('/cambiar-role/:id', verificarAdministrador, cambiarRole)
