@@ -12,6 +12,7 @@ import Crear from './paginas/Crear'
 import Perfil from './paginas/Perfil'
 import { Confirmar } from './paginas/Confirmar'
 import CajaDeVenta from './paginas/CajaDeVenta'
+import Restablecer from './paginas/Restablecer'
 
 import { AuthProvider } from './context/AuthProvider'
 import { PrivateRoute } from './routes/privateRoutes'
@@ -31,6 +32,7 @@ function App() {
             <Route path='login' element={<Login/>}/>          
             <Route path='forgot/:id' element={<Forgot/>}/>
             <Route path='confirmar/:token' element={<Confirmar/>}/>
+            <Route path='recuperar-password/:token' element={<Restablecer/>}/>
             <Route path='*' element={<NotFound />} />
           </Route>
 

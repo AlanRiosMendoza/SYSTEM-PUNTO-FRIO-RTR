@@ -34,6 +34,7 @@ const FormularioCliente = ({
       setMensaje({ respuesta: mensajeExito, tipo: true });
       setTimeout(() => setMensaje({}), 5000);
       setMostrarModal(false);
+      setCliente("")
     } catch (error) {
       setMensaje({
         respuesta: error.response?.data?.msg || "Error en la operación.",
