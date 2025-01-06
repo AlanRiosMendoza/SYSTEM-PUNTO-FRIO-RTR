@@ -26,16 +26,16 @@ const CajaDeVenta = () => {
 
   return (
     <div>
-      <h1 className="font-black text-4xl text-gray-500">Caja de Venta</h1>
+      <h1 className="font-black text-3xl sm:text-4xl text-gray-500">Caja de Venta</h1>
       <hr className="my-2" />
 
       <p className="mb-4">Listo para realizar una venta</p>
 
       {/* Botones para Crear Cliente, Ver Clientes y Gestionar Envases */}
-      <div className="flex space-x-4 mb-4">
+      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
         <button
           onClick={() => setMostrarModal(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+          className="px-6 py-3 bg-[#695230] text-white rounded-md hover:bg-blue-600 transition"
         >
           Crear Cliente
         </button>
@@ -44,11 +44,7 @@ const CajaDeVenta = () => {
             setMostrarTabla(!mostrarTabla);
             setMostrarEnvases(false);
           }}
-          className={`px-4 py-2 ${
-            mostrarTabla ? "bg-gray-500" : "bg-green-500"
-          } text-white rounded-md hover:${
-            mostrarTabla ? "bg-gray-600" : "bg-green-600"
-          } transition`}
+          className={`px-6 py-3 ${mostrarTabla ? "bg-gray-500" : "bg-[#695230]"} text-white rounded-md hover:${mostrarTabla ? "bg-gray-600" : "bg-green-600"} transition`}
         >
           {mostrarTabla ? "Cajero" : "Ver Clientes"}
         </button>
@@ -57,19 +53,15 @@ const CajaDeVenta = () => {
             setMostrarEnvases(!mostrarEnvases);
             setMostrarTabla(false);
           }}
-          className={`px-4 py-2 ${
-            mostrarEnvases ? "bg-gray-500" : "bg-purple-500"
-          } text-white rounded-md hover:${
-            mostrarEnvases ? "bg-gray-600" : "bg-purple-600"
-          } transition`}
+          className={`px-6 py-3 ${mostrarEnvases ? "bg-gray-500" : "bg-[#695230]"} text-white rounded-md hover:${mostrarEnvases ? "bg-gray-600" : "bg-purple-600"} transition`}
         >
           {mostrarEnvases ? "Cajero" : "Gestionar Envases"}
         </button>
 
         {/* Botón para ver factura */}
         <button
-          onClick={() => verFactura('12345')} // Este ID es un ejemplo, reemplázalo con el ID real de la venta
-          className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
+          onClick={() => verFactura('12345')}
+          className="px-6 py-3 bg-[#695230] text-white rounded-md hover:bg-yellow-600 transition"
         >
           Ver Factura
         </button>
@@ -97,7 +89,7 @@ const CajaDeVenta = () => {
       {mostrarFactura && (
         <button
           onClick={ocultarFactura}
-          className="px-4 py-2 mt-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+          className="px-6 py-3 mt-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
         >
           Cerrar Factura
         </button>

@@ -126,10 +126,10 @@ const GestionEnvases = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Gestión de Envases</h2>
-
+  
       {/* Mostrar mensaje */}
       {mensaje && <Mensaje tipo={false}>{mensaje}</Mensaje>}
-
+  
       {/* Selección de cliente */}
       {!clienteSeleccionado ? (
         <div className="max-w-4xl mb-4 mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -144,7 +144,7 @@ const GestionEnvases = () => {
           />
           <button
             onClick={() => buscarCliente(busquedaCliente)}
-            className="bg-blue-500 text-white px-4 py-2 mb-2 rounded-md hover:bg-blue-600 transition"
+            className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 rounded-md hover:bg-blue-600 transition"
           >
             Buscar
           </button>
@@ -161,76 +161,84 @@ const GestionEnvases = () => {
           </p>
           <button
             onClick={() => setClienteSeleccionado(null)}
-            className="bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
+            className="w-full sm:w-auto bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
           >
             Cambiar Cliente
           </button>
         </div>
       )}
-
+  
       {/* Registrar préstamo */}
       <div className="max-w-4xl mb-4 mx-auto bg-white rounded-lg shadow-lg p-6">
         <h3 className="text-xl font-bold mb-4">Registrar Préstamo</h3>
-        <input
-          type="number"
-          placeholder="Cantidad de Préstamo"
-          value={prestamo_cantidad}
-          onChange={(e) => setPrestamo_cantidad(e.target.value)}
-          className="border px-2 py-1 mr-2"
-        />
-        <input
-          type="number"
-          placeholder="Depósito"
-          value={deposito_cantidad}
-          onChange={(e) => setDeposito_cantidad(e.target.value)}
-          className="border px-2 py-1 mr-2"
-        />
-        <button
-          onClick={handleCrearEnvase}
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-        >
-          Crear Préstamo
-        </button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <input
+            type="number"
+            placeholder="Cantidad de Préstamo"
+            value={prestamo_cantidad}
+            onChange={(e) => setPrestamo_cantidad(e.target.value)}
+            className="w-full sm:w-auto border px-2 py-1 mb-4 sm:mb-0 sm:mr-2"
+          />
+          <input
+            type="number"
+            placeholder="Depósito"
+            value={deposito_cantidad}
+            onChange={(e) => setDeposito_cantidad(e.target.value)}
+            className="w-full sm:w-auto border px-2 py-1 mb-4 sm:mb-0 sm:mr-2"
+          />
+          <button
+            onClick={handleCrearEnvase}
+            className="w-full sm:w-auto bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+          >
+            Crear Préstamo
+          </button>
+        </div>
       </div>
-
+  
       {/* Listado de préstamos */}
-      <table className="w-full mt-5 table-auto shadow-lg bg-white ">
-        <thead className="bg-gray-800 text-slate-400">
-          <tr>
-            {/* <th>ID</th> */}
-            <th className="p-2">Cliente</th>
-            <th className="p-2">Préstamo</th>
-            <th className="p-2">Depósito</th>
-            <th className="p-2">Devuelto</th>
-            <th className="p-2">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {envases.map((envase) => (
-            <tr key={envase._id}>
-              {/* <td>{envase._id}</td> */}
-              <td className="border-b hover:bg-gray-300 text-center">
-                {envase.cliente_id?.nombre} {envase.cliente_id?.apellido}
-              </td>
-              <td className="border-b hover:bg-gray-300 text-center">{envase.prestamo}</td>
-              <td className="border-b hover:bg-gray-300 text-center">{envase.deposito}</td>
-              <td className="border-b hover:bg-gray-300 text-center">{envase.devuelto ? "Sí" : "No"}</td>
-              <td className="border-b hover:bg-gray-300 text-center">
-                {!envase.devuelto && (
-                  <button
-                    onClick={() => handleDevolverEnvase(envase._id)}
-                    className="bg-purple-500 text-white px-2 py-1 rounded-md hover:bg-purple-600"
-                  >
-                    Devolver
-                  </button>
-                )}
-              </td>
+      <div className="overflow-x-auto">
+        <table className="w-full mt-5 table-auto shadow-lg bg-white">
+          <thead className="bg-gray-800 text-slate-400">
+            <tr>
+              <th className="p-2 text-xs sm:text-sm">Cliente</th>
+              <th className="p-2 text-xs sm:text-sm">Préstamo</th>
+              <th className="p-2 text-xs sm:text-sm">Depósito</th>
+              <th className="p-2 text-xs sm:text-sm">Devuelto</th>
+              <th className="p-2 text-xs sm:text-sm">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {envases.map((envase) => (
+              <tr key={envase._id}>
+                <td className="border-b hover:bg-gray-300 text-center text-xs sm:text-sm">
+                  {envase.cliente_id?.nombre} {envase.cliente_id?.apellido}
+                </td>
+                <td className="border-b hover:bg-gray-300 text-center text-xs sm:text-sm">
+                  {envase.prestamo}
+                </td>
+                <td className="border-b hover:bg-gray-300 text-center text-xs sm:text-sm">
+                  {envase.deposito}
+                </td>
+                <td className="border-b hover:bg-gray-300 text-center text-xs sm:text-sm">
+                  {envase.devuelto ? "Sí" : "No"}
+                </td>
+                <td className="border-b hover:bg-gray-300 text-center text-xs sm:text-sm">
+                  {!envase.devuelto && (
+                    <button
+                      onClick={() => handleDevolverEnvase(envase._id)}
+                      className="bg-purple-500 text-white px-2 py-1 rounded-md hover:bg-purple-600"
+                    >
+                      Devolver
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-  );
+  );  
 };
 
 export default GestionEnvases;

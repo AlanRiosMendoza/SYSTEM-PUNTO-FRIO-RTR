@@ -186,10 +186,8 @@ const PuntoDeVenta = () => {
       <div className="max-w-4xl mx-auto p-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Punto de Venta</h2>
 
-        {/* Mostrar mensaje */}
         {mensaje && <Mensaje tipo={true}>{mensaje}</Mensaje>}
 
-        {/* Selección de cliente */}
         {!clienteSeleccionado ? (
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Buscar Cliente</h3>
@@ -202,12 +200,11 @@ const PuntoDeVenta = () => {
               className="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />
             <button
-                onClick={() => buscarCliente(busquedaCliente)}
-                className="bg-blue-500 text-white px-4 py-2 mb-2 rounded-md hover:bg-blue-600 transition"
-              >
-                Buscar
+              onClick={() => buscarCliente(busquedaCliente)}
+              className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 rounded-md hover:bg-blue-600 transition"
+            >
+              Buscar
             </button>
-
           </div>
         ) : (
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -220,26 +217,24 @@ const PuntoDeVenta = () => {
             </p>
             <button
               onClick={() => setClienteSeleccionado()}
-              className="bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
+              className="w-full sm:w-auto bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
             >
               Cambiar Cliente
             </button>
           </div>
         )}
 
-
-        {/* Barra de búsqueda para seleccionar producto */}
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 mt-4">
-          <label className="block text-xl font-bold mb-4 text-gray-700">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 mt-4 sm:p-4 sm:mt-2">
+          <label className="block text-xl font-bold mb-4 text-gray-700 sm:text-lg">
             Buscar Producto:
           </label>
-          <div className="flex gap-2">
+          <div className="border px-2 py-1 mr-2">
             <input
               type="text"
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Escribe el nombre del producto..."
-              className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              className="flex-grow px-4 py-2 mx-2 mb-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 sm:text-sm"
             />
             <input
               type="text"
@@ -250,18 +245,17 @@ const PuntoDeVenta = () => {
                   setCantidad(Number(e.target.value));
                 }
               }}
-              className="w-20 px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-20 px-4 py-2 mx-2 mb-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200 sm:text-sm"
             />
             <button
               onClick={agregarProducto}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+              className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition sm:text-sm"
             >
               Agregar
             </button>
           </div>
         </div>
 
-        {/* Mostrar la lista de productos solo si hay texto en la barra de búsqueda */}
         {busqueda && productosFiltrados.length > 0 && (
           <div className="mb-6">
             <ul className="bg-gray-200 rounded-md shadow-md max-h-60 overflow-y-auto">
@@ -270,7 +264,7 @@ const PuntoDeVenta = () => {
                   key={producto._id}
                   onClick={() => {
                     setProductoSeleccionado(producto._id);
-                    setBusqueda(producto.nombre); // Autocompletar en el input
+                    setBusqueda(producto.nombre); 
                   }}
                   className="px-4 py-2 cursor-pointer hover:bg-blue-500 hover:text-white"
                 >
@@ -281,43 +275,43 @@ const PuntoDeVenta = () => {
           </div>
         )}
 
-        {/* Lista de Productos Seleccionados */}
-        <table className="w-full mt-5 table-auto shadow-lg bg-white">
-          <thead className="bg-gray-800 text-slate-400">
-            <tr>
-              <th className="px-4 py-2 border">Producto</th>
-              <th className="px-4 py-2 border">Cantidad</th>
-              <th className="px-4 py-2 border">Precio Unitario</th>
-              <th className="px-4 py-2 border">Subtotal</th>
-              <th className="px-4 py-2 border">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productosSeleccionados.map((p) => (
-              <tr key={p.producto_id}>
-                <td className="px-4 py-2 border text-center">{p.nombre}</td>
-                <td className="px-4 py-2 border text-center">{p.cantidad}</td>
-                <td className="px-4 py-2 border text-center">${p.precio.toFixed(2)}</td>
-                <td className="px-4 py-2 border text-center">${p.subtotal.toFixed(2)}</td>
-                <td className="px-4 py-2 border text-center">
-                  <button
-                    onClick={() => eliminarProducto(p.producto_id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                  >
-                    Eliminar
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full mt-5 table-auto shadow-lg bg-white">
+            <thead className="bg-gray-800 text-slate-400">
+              <tr>
+                <th className="px-4 py-2 border">Producto</th>
+                <th className="px-4 py-2 border">Cantidad</th>
+                <th className="px-4 py-2 border">Precio Unitario</th>
+                <th className="px-4 py-2 border">Subtotal</th>
+                <th className="px-4 py-2 border">Acción</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {productosSeleccionados.map((p) => (
+                <tr key={p.producto_id}>
+                  <td className="px-4 py-2 border text-center">{p.nombre}</td>
+                  <td className="px-4 py-2 border text-center">{p.cantidad}</td>
+                  <td className="px-4 py-2 border text-center">${p.precio.toFixed(2)}</td>
+                  <td className="px-4 py-2 border text-center">${p.subtotal.toFixed(2)}</td>
+                  <td className="px-4 py-2 border text-center">
+                    <button
+                      onClick={() => eliminarProducto(p.producto_id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Total y Finalización */}
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold text-gray-700">Total: ${total.toFixed(2)}</h3>
           <button
             onClick={finalizarVenta}
-            className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+            className="w-full sm:w-auto px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
           >
             Finalizar Venta
           </button>

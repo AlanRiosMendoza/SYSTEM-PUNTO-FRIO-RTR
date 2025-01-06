@@ -69,52 +69,51 @@ const TablaClientes = ({ setMostrarTabla }) => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Clientes Registrados</h2>
-      <table className="min-w-full divide-y divide-gray-200 border shadow-lg">
-        <thead className="bg-gray-800 text-slate-400">
-          <tr>
-            <th className="p-2">N°</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Nombre</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Apellido</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Cédula</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Correo</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Teléfono</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Dirección</th>
-            <th className="px-4 py-2 text-sm font-medium uppercase">Acciones</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {clientes.map((cliente, index) => (
-            <tr key={cliente._id}>
-              <td className="px-4 py-2 text-center">
-                {(pagina - 1) * limite + index + 1}
-              </td>
-              <td className="px-4 py-2 text-center">{cliente.nombre}</td>
-              <td className="px-4 py-2 text-center">{cliente.apellido}</td>
-              <td className="px-4 py-2 text-center">{cliente.cedula}</td>
-              <td className="px-4 py-2 text-center">{cliente.correo}</td>
-              <td className="px-4 py-2 text-center">{cliente.telefono}</td>
-              <td className="px-4 py-2 text-center">{cliente.direccion}</td>
-              <td className="px-4 py-2 text-center">
-                <button
-                  onClick={() => handleEditarCliente(cliente)}
-                  className="px-2 py-1 bg-blue-500 text-white rounded"
-                >
-                  Editar
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 border shadow-lg">
+          <thead className="bg-gray-800 text-slate-400">
+            <tr>
+              <th className="p-2">N°</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Nombre</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Apellido</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Cédula</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Correo</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Teléfono</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Dirección</th>
+              <th className="px-4 py-2 text-sm font-medium uppercase">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {clientes.map((cliente, index) => (
+              <tr key={cliente._id}>
+                <td className="px-4 py-2 text-center">
+                  {(pagina - 1) * limite + index + 1}
+                </td>
+                <td className="px-4 py-2 text-center">{cliente.nombre}</td>
+                <td className="px-4 py-2 text-center">{cliente.apellido}</td>
+                <td className="px-4 py-2 text-center">{cliente.cedula}</td>
+                <td className="px-4 py-2 text-center">{cliente.correo}</td>
+                <td className="px-4 py-2 text-center">{cliente.telefono}</td>
+                <td className="px-4 py-2 text-center">{cliente.direccion}</td>
+                <td className="px-4 py-2 text-center">
+                  <button
+                    onClick={() => handleEditarCliente(cliente)}
+                    className="px-2 py-1 bg-blue-500 text-white rounded"
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+  
       <div className="flex justify-center mt-4">
         <button
           onClick={handlePaginaAnterior}
           disabled={pagina === 1}
-          className={`px-4 py-2 border rounded-l ${
-            pagina === 1
-              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-              : "bg-gray-800 text-white hover:bg-gray-700"
-          }`}
+          className={`px-4 py-2 border rounded-l ${pagina === 1 ? "bg-gray-300 text-gray-600 cursor-not-allowed" : "bg-gray-800 text-white hover:bg-gray-700"}`}
         >
           Anterior
         </button>
@@ -124,16 +123,12 @@ const TablaClientes = ({ setMostrarTabla }) => {
         <button
           onClick={handlePaginaSiguiente}
           disabled={!hayMas}
-          className={`px-4 py-2 border rounded-r ${
-            !hayMas
-              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-              : "bg-gray-800 text-white hover:bg-gray-700"
-          }`}
+          className={`px-4 py-2 border rounded-r ${!hayMas ? "bg-gray-300 text-gray-600 cursor-not-allowed" : "bg-gray-800 text-white hover:bg-gray-700"}`}
         >
           Siguiente
         </button>
       </div>
-
+  
       {/* Componente de ActualizarCliente */}
       {mostrarModal && (
         <ActualizarCliente
@@ -144,7 +139,7 @@ const TablaClientes = ({ setMostrarTabla }) => {
         />
       )}
     </div>
-  );
+  );  
 };
 
 export default TablaClientes;

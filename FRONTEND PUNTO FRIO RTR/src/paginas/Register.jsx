@@ -224,7 +224,7 @@ export const Register = () => {
                         
                         <div className="mb-3 text-center">
                             <button 
-                            className="w-1/2 bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-base"
+                            className="w-1/2 bg-[#67841e] text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-base"
                             >Registrar
                             </button>
                         </div>
