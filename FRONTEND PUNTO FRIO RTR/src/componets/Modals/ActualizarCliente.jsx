@@ -10,6 +10,17 @@ const ActualizarCliente = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Limitar la longitud del nombre y apellido a 50 caracteres
+    if ((name === "nombre" || name === "apellido") && value.length > 30) {
+      setMensaje({
+          respuesta: `El ${name} no puede exceder los 30 caracteres.`,
+          tipo: false,
+      });
+      setTimeout(() => {
+          setMensaje({});
+      }, 3000);
+      return;
+    }
     setClienteSeleccionado((prev) => ({
       ...prev,
       [name]: value,
@@ -18,6 +29,17 @@ const ActualizarCliente = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Validación de longitud de nombre
+    if (clienteSeleccionado.nombre.trim().length > 30) {
+      setMensaje({ respuesta: "El nombre no puede exceder los 30 caracteres.", tipo: false });
+      return;
+  } 
+
+  // Validación de longitud de apellido
+  if (clienteSeleccionado.apellido.trim().length > 30) {
+      setMensaje({ respuesta: "El apellido no puede exceder los 30 caracteres.", tipo: false });
+      return;
+  }
     actualizarCliente(clienteSeleccionado._id, clienteSeleccionado);
   };
 
@@ -36,6 +58,9 @@ const ActualizarCliente = ({
               className="w-full p-2 border rounded"
               required
             />
+            <small className="text-gray-500">
+              {30 - clienteSeleccionado.nombre.length} caracteres restantes
+            </small>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium">Apellido</label>
@@ -47,6 +72,9 @@ const ActualizarCliente = ({
               className="w-full p-2 border rounded"
               required
             />
+            <small className="text-gray-500">
+              {30 - clienteSeleccionado.nombre.length} caracteres restantes
+            </small>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium">Cédula</label>
@@ -97,6 +125,7 @@ const ActualizarCliente = ({
               type="text"
               name="direccion"
               value={clienteSeleccionado.direccion || ""}
+              maxLength={70}
               onChange={handleChange}
               className="w-full p-2 border rounded"
               required

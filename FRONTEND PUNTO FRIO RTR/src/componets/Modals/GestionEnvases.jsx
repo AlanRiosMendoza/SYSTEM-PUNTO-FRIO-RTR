@@ -4,7 +4,7 @@ import Mensaje from "../Alertas/Mensaje";
 
 const GestionEnvases = () => {
   const [envases, setEnvases] = useState([]);
-  const [mensaje, setMensaje] = useState(""); // Mensaje de error o información
+  const [mensaje, setMensaje] = useState({}); 
   const [prestamo_cantidad, setPrestamo_cantidad] = useState("");
   const [deposito_cantidad, setDeposito_cantidad] = useState("");
   const [busquedaCliente, setBusquedaCliente] = useState("");
@@ -13,7 +13,7 @@ const GestionEnvases = () => {
   // Buscar cliente por cédula
   const buscarCliente = async (cedula) => {
     if (!cedula) {
-      setMensaje("Por favor, ingrese la cédula del cliente.");
+      setMensaje({ texto: "Por favor, ingrese la cédula del cliente.", tipo: false });
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
@@ -29,13 +29,13 @@ const GestionEnvases = () => {
         setClienteSeleccionado(respuesta.data[0]);
         setMensaje("");
       } else {
-        setMensaje("No se encontró un cliente con la cédula proporcionada.");
+        setMensaje({texto:"No se encontró un cliente con la cédula proporcionada.", tipo: false });
         setTimeout(() => setMensaje(""), 4000);
       }
       setBusquedaCliente("");
     } catch (error) {
       console.error("Error al buscar cliente:", error);
-      setMensaje("Error al buscar el cliente. Verifique la cédula.");
+      setMensaje({texto:"Error al buscar el cliente. Verifique la cédula.", tipo: false});
       setTimeout(() => setMensaje(""), 4000);
     }
   };
@@ -59,13 +59,13 @@ const GestionEnvases = () => {
   // Registrar préstamo de envases
   const handleCrearEnvase = async () => {
     if (!clienteSeleccionado) {
-      setMensaje("Debe buscar un cliente primero.");
+      setMensaje({texto:"Debe buscar un cliente primero.", tipo: false});
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
 
     if (!prestamo_cantidad || !deposito_cantidad) {
-      setMensaje("Debe completar los campos de préstamo y depósito.");
+      setMensaje({texto:"Debe completar los campos de préstamo y depósito.", tipo: false});
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
@@ -81,13 +81,13 @@ const GestionEnvases = () => {
 
     const prestamoData = {
       cliente_id: clienteSeleccionado._id,
-      prestamo: parseInt(prestamo_cantidad),
-      deposito: parseInt(deposito_cantidad),
+      prestamo: prestamo_cantidad,
+      deposito: deposito_cantidad,
     };
 
     try {
       await axios.post(url, prestamoData, options);
-      setMensaje("Envase registrado con éxito.");
+      setMensaje({texto:"Envase registrado con éxito.", tipo: true});
       setTimeout(() => setMensaje(""), 4000);
 
       setClienteSeleccionado(null);
@@ -97,7 +97,7 @@ const GestionEnvases = () => {
       fetchEnvases();
     } catch (error) {
       console.error("Error al registrar el préstamo:", error);
-      setMensaje("Hubo un error al procesar el préstamo.");
+      setMensaje({texto:"Hubo un error al procesar el préstamo.", tipo: false});
       setTimeout(() => setMensaje(""), 4000);
     }
   };
@@ -128,7 +128,7 @@ const GestionEnvases = () => {
       <h2 className="text-2xl font-bold mb-4">Gestión de Envases</h2>
   
       {/* Mostrar mensaje */}
-      {mensaje && <Mensaje tipo={false}>{mensaje}</Mensaje>}
+      {mensaje.texto && <Mensaje tipo={mensaje.tipo}>{mensaje.texto}</Mensaje>}
   
       {/* Selección de cliente */}
       {!clienteSeleccionado ? (
@@ -173,14 +173,14 @@ const GestionEnvases = () => {
         <h3 className="text-xl font-bold mb-4">Registrar Préstamo</h3>
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
           <input
-            type="number"
+            type="text"
             placeholder="Cantidad de Préstamo"
             value={prestamo_cantidad}
             onChange={(e) => setPrestamo_cantidad(e.target.value)}
             className="w-full sm:w-auto border px-2 py-1 mb-4 sm:mb-0 sm:mr-2"
           />
           <input
-            type="number"
+            type="text"
             placeholder="Depósito"
             value={deposito_cantidad}
             onChange={(e) => setDeposito_cantidad(e.target.value)}

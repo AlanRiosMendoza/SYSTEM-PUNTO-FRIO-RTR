@@ -19,6 +19,17 @@ export const Register = () => {
 
     const handlerChange = (e) => {
         const { name, value } = e.target;
+        // Limitar la longitud del nombre y apellido a 50 caracteres
+        if ((name === "nombre" || name === "apellido") && value.length > 30) {
+            setMensaje({
+                respuesta: `El ${name} no puede exceder los 30 caracteres.`,
+                tipo: false,
+            });
+            setTimeout(() => {
+                setMensaje({});
+            }, 3000);
+            return;
+        }
         setform({
             ...form,
             [name]: name === "rol" ? value.toLowerCase() : value, // Convertir rol a minúsculas
@@ -27,7 +38,19 @@ export const Register = () => {
     
     const handlerSubmit = async (e) => {
         e.preventDefault();
-    
+        
+        // Validación de longitud de nombre
+        if (form.nombre.trim().length > 30) {
+            setMensaje({ respuesta: "El nombre no puede exceder los 30 caracteres.", tipo: false });
+            return;
+        }
+
+        // Validación de longitud de apellido
+        if (form.apellido.trim().length > 30) {
+            setMensaje({ respuesta: "El apellido no puede exceder los 30 caracteres.", tipo: false });
+            return;
+        }
+
         // Validación de nombre
         if (!form.nombre || form.nombre.trim().length < 3) {
             setMensaje({ respuesta: "El nombre es obligatorio y debe tener al menos 3 caracteres.", tipo: false });
@@ -150,13 +173,25 @@ export const Register = () => {
                                 placeholder="Ingresar nombre" 
                                 className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" 
                                 required/>
+                            <small className="text-gray-500">
+                                {30 - form.nombre.length} caracteres restantes
+                            </small>
                         </div>
 
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold text-gray-400" htmlFor="apellido">Apellido</label>
-                            <input type="name" 
-                            id="apellido" name="apellido" value={form.apellido || ""} onChange={handlerChange}
-                            placeholder="Ingresar apellido" className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" />
+                            <input 
+                                type="name" 
+                                id="apellido" 
+                                name="apellido" 
+                                value={form.apellido || ""} 
+                                onChange={handlerChange}
+                                placeholder="Ingresar apellido" 
+                                className="block w-full rounded-md border border-gray-800 focus:border-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-800 py-1 px-1.5 bg-white text-black" 
+                                required/>
+                            <small className="text-gray-500">
+                                {30 - form.apellido.length} caracteres restantes
+                            </small>    
                         </div>
 
                         <div className="mb-3">

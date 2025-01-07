@@ -21,6 +21,17 @@ const FormularioCliente = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Limitar la longitud del nombre y apellido a 50 caracteres
+    if ((name === "nombre" || name === "apellido") && value.length > 30) {
+      setMensaje({
+          respuesta: `El ${name} no puede exceder los 30 caracteres.`,
+          tipo: false,
+      });
+      setTimeout(() => {
+          setMensaje({});
+      }, 3000);
+      return;
+    }
     setCliente((prev) => ({
       ...prev,
       [name]: value,
@@ -29,6 +40,18 @@ const FormularioCliente = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validación de longitud de nombre
+    if (cliente.nombre.trim().length > 30) {
+        setMensaje({ respuesta: "El nombre no puede exceder los 30 caracteres.", tipo: false });
+        return;
+    } 
+
+    // Validación de longitud de apellido
+    if (cliente.apellido.trim().length > 30) {
+        setMensaje({ respuesta: "El apellido no puede exceder los 30 caracteres.", tipo: false });
+        return;
+    }
+
     try {
       await onSubmit(cliente); // Ejecuta la función onSubmit pasada como prop
       setMensaje({ respuesta: mensajeExito, tipo: true });
@@ -68,6 +91,9 @@ const FormularioCliente = ({
               className="w-full border p-2 rounded-md"
               required
             />
+            <small className="text-gray-500">
+              {30 - cliente.nombre.length} caracteres restantes
+            </small>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -81,6 +107,9 @@ const FormularioCliente = ({
               className="w-full border p-2 rounded-md"
               required
             />
+            <small className="text-gray-500">
+              {30 - cliente.apellido.length} caracteres restantes
+            </small>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -139,6 +168,7 @@ const FormularioCliente = ({
               type="text"
               name="direccion"
               value={cliente.direccion}
+              maxLength={70}
               onChange={handleChange}
               className="w-full border p-2 rounded-md"
               required

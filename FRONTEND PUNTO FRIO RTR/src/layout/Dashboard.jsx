@@ -11,11 +11,11 @@ const Dashboard = () => {
     const autenticado = localStorage.getItem('token');
 
     const links = [
-        { to: '/dashboard', label: 'Perfil' },
-        { to: '/dashboard/listar', label: 'Listar' },
-        { to: '/dashboard/crear', label: 'Crear' },
-        { to: '/dashboard/CajaDeVenta', label: 'Caja de venta' },
-        { to: '/dashboard/register', label: 'Registrar' },
+        { to: '/dashboard', label: 'Perfil de usuario' },
+        { to: '/dashboard/listar', label: 'Lista e Informe' },
+        { to: '/dashboard/crear', label: 'Productos' },
+        { to: '/dashboard/CajaDeVenta', label: 'Caja registradora' },
+        { to: '/dashboard/register', label: 'Administración de usuarios' },
     ];
 
     useEffect(() => {
@@ -32,23 +32,15 @@ const Dashboard = () => {
         <div className="md:flex md:min-h-screen">
             {/* Sidebar */}
             <div className="md:w-1/5 bg-gradient-to-r from-black to-[#67841e] px-5 py-4">
-                <h2 className="text-4xl font-black text-center text-[#FFD700]">Sistema de Ventas</h2>
-    
-                <img
-                    src="https://cdn-icons-png.flaticon.com/512/4715/4715329.png"
-                    alt="Usuario conectado"
-                    className="m-auto mt-8 p-1 border-4 border-[#FFD700] rounded-full"
-                    width={120}
-                    height={120}
-                />
+                <h2 className="text-3xl font-black text-center text-[#FFD700]">Sistema de Ventas Punto Frio RTR</h2>
+
                 <p className="text-[#F7F3E9] text-center my-4 text-sm">
                     <span className="bg-green-600 w-3 h-3 inline-block rounded-full"></span> Bienvenido - {localAuth?.nombre || "Cargando..."}
                 </p>
                 <p className="text-[#F7F3E9] text-center my-4 text-sm">Rol - {localAuth?.rol || "Cargando..."}</p>
-                <hr className="mt-5 border-[#FFD700]" />
     
                 {/* Links de navegación */}
-                <ul className="mt-5">
+                <ul className="mt-10">
                     {links.map((link) => (
                         <li key={link.to} className="text-center">
                             <Link
@@ -57,7 +49,7 @@ const Dashboard = () => {
                                     urlActual === link.to
                                         ? 'text-[#FFD700] bg-[#67841e] px-3 py-2 rounded-md'
                                         : 'text-[#F7F3E9]'
-                                } text-xl block mt-2 hover:text-[#FFD700]`}
+                                } text-lg block mt-2 hover:text-[#FFD700] my-3`}
                             >
                                 {link.label}
                             </Link>
