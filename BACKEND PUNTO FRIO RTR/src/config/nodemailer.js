@@ -27,7 +27,7 @@ const sendMailToUser = (userMail, resetCode) => {
         </p>
 
         <p style="font-size: 16px; line-height: 1.5; color: #555;">
-            Utiliza el siguiente código para continuar o haz clic en el botón a continuación para restablecer tu contraseña:
+            Haz clic en el botón a continuación para restablecer tu contraseña:
         </p>
 
         <div style="text-align: center; margin: 20px 0;">
