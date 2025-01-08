@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Mensaje from "../Alertas/Mensaje";
 
 const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
   const [categorias, setCategorias] = useState([]);
+  const [mensaje, setMensaje] = useState({});
   const [formData, setFormData] = useState({
     nombre: "",
     categoria_id: "",
@@ -48,6 +50,16 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if ((name === "nombre") && value.length > 50) {
+        setMensaje({
+            respuesta: `El ${name} no puede exceder los 50 caracteres.`,
+            tipo: false,
+        });
+        setTimeout(() => {
+            setMensaje({});
+        }, 3000);
+        return;
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -56,6 +68,11 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validación de longitud de nombre
+    if (formData.nombre.trim().length > 50) {
+      setMensaje({ respuesta: "El nombre no puede exceder los 50 caracteres.", tipo: false });
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       const url = `${import.meta.env.VITE_BACKEND_URL}/producto/${producto._id}`;
@@ -81,6 +98,11 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
       <div className="bg-white rounded-lg p-6 w-96">
         <h2 className="text-xl font-semibold mb-4">Actualizar Producto</h2>
         <form onSubmit={handleSubmit}>
+          {Object.keys(mensaje).length > 0 && (
+              <Mensaje tipo={mensaje.tipo} className="mb-4">
+                  {mensaje.respuesta}
+              </Mensaje>
+          )}
           <div className="mb-4">
             <label className="block text-sm font-medium">Nombre</label>
             <input
@@ -91,6 +113,9 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
               className="w-full p-2 border rounded"
               required
             />
+            <small className="text-gray-500">
+              {50 - formData.nombre.length} caracteres restantes
+            </small>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium">Categoría</label>

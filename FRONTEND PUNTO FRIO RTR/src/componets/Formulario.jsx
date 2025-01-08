@@ -46,6 +46,16 @@ export const Formulario = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if ((name === "nombre") && value.length > 50) {
+            setMensaje({
+                respuesta: `El ${name} no puede exceder los 50 caracteres.`,
+                tipo: false,
+            });
+            setTimeout(() => {
+                setMensaje({});
+            }, 3000);
+            return;
+        }
         setForm({
             ...form,
             [name]: value === "true" ? true : value === "false" ? false : value,
@@ -54,6 +64,28 @@ export const Formulario = () => {
 
     const handleNuevaCategoriaChange = (e) => {
         const { name, value } = e.target;
+        // Limitar la longitud del nombre y apellido a 50 caracteres
+        if ((name === "nombre") && value.length > 30) {
+            setMensaje({
+                respuesta: `El ${name} no puede exceder los 30 caracteres.`,
+                tipo: false,
+            });
+            setTimeout(() => {
+                setMensaje({});
+            }, 3000);
+            return;
+        }
+        // Limitar la longitud del nombre y apellido a 50 caracteres
+        if ((name === "descripcion") && value.length > 80) {
+            setMensaje({
+                respuesta: `El ${name} no puede exceder los 80 caracteres.`,
+                tipo: false,
+            });
+            setTimeout(() => {
+                setMensaje({});
+            }, 3000);
+            return;
+        }
         setNuevaCategoria({
             ...nuevaCategoria,
             [name]: value,
@@ -88,7 +120,22 @@ export const Formulario = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Validación de longitud de nombre
+        if (nuevaCategoria.nombre.trim().length > 30) {
+            setMensaje({ respuesta: "El nombre no puede exceder los 30 caracteres.", tipo: false });
+            return;
+        }
 
+        // Validación de longitud de apellido
+        if (nuevaCategoria.descripcion.trim().length > 80) {
+            setMensaje({ respuesta: "El apellido no puede exceder los 80 caracteres.", tipo: false });
+            return;
+        }
+        // Validación de longitud de nombre
+        if (form.nombre.trim().length > 50) {
+            setMensaje({ respuesta: "El nombre no puede exceder los 50 caracteres.", tipo: false });
+            return;
+        }
         try {
             const token = localStorage.getItem("token");
             const url = `${import.meta.env.VITE_BACKEND_URL}/producto`; // Ajusta según tu ruta de API
@@ -151,12 +198,15 @@ export const Formulario = () => {
                     <input
                         id="nombre"
                         type="text"
-                        className="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md mb-5"
+                        className="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
                         placeholder="Nombre"
                         name="nombre"
                         value={form.nombre}
                         onChange={handleChange}
                     />
+                    <small className="text-gray-500">
+                        {50 - form.nombre.length} caracteres restantes
+                    </small>
                 </div>
 
                 <div>
@@ -280,10 +330,16 @@ export const Formulario = () => {
                 />
             </form>
             {mostrarModal && (
+                
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
                         <h2 className="text-lg font-bold mb-4">Agregar nueva categoría</h2>
                         <form onSubmit={agregarCategoria}>
+                            {Object.keys(mensaje).length > 0 && (
+                                <Mensaje tipo={mensaje.tipo} className="mb-4">
+                                    {mensaje.respuesta}
+                                </Mensaje>
+                            )}
                             <div className="mb-4">
                                 <label className="block text-gray-700">Nombre</label>
                                 <input
@@ -295,6 +351,9 @@ export const Formulario = () => {
                                     placeholder="Nombre de la categoría"
                                     required
                                 />
+                                <small className="text-gray-500">
+                                    {30 - nuevaCategoria.nombre.length} caracteres restantes
+                                </small>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-gray-700">Descripción</label>
@@ -306,6 +365,9 @@ export const Formulario = () => {
                                     placeholder="Descripción de la categoría"
                                     required
                                 ></textarea>
+                                <small className="text-gray-500">
+                                    {80 - nuevaCategoria.descripcion.length} caracteres restantes
+                                </small>
                             </div>
                             <div className="flex justify-end space-x-4">
                                 <button

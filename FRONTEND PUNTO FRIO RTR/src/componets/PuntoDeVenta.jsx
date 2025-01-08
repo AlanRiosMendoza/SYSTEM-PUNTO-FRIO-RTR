@@ -8,34 +8,36 @@ const PuntoDeVenta = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState("");
   const [cantidad, setCantidad] = useState(1);
   const [total, setTotal] = useState(0);
-  const [mensaje, setMensaje] = useState("");
+  const [mensaje, setMensaje] = useState({});
   const [busqueda, setBusqueda] = useState(""); // Estado para el filtro de búsqueda
-  
-   // Estados para manejar clientes
+
+  // Estados para manejar clientes
   const [busquedaCliente, setBusquedaCliente] = useState("");
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
 
   // Cargar productos desde el backend
   useEffect(() => {
     const cargarProductos = async () => {
-    const token = localStorage.getItem("token");
-    const url = `${import.meta.env.VITE_BACKEND_URL}/productos`;
-    const options = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
+      const token = localStorage.getItem("token");
+      const url = `${import.meta.env.VITE_BACKEND_URL}/productos`;
+      const options = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-    try {
-      const respuesta = await axios.get(url, options);
-      // Filtrar solo los productos activos
-      const productosActivos = respuesta.data.filter((producto) => producto.activo);
-      setProductosDisponibles(productosActivos);
-    } catch (error) {
-      console.error("Error al cargar productos:", error);
-    }
-  };
+      try {
+        const respuesta = await axios.get(url, options);
+        // Filtrar solo los productos activos
+        const productosActivos = respuesta.data.filter((producto) => producto.activo);
+        setProductosDisponibles(productosActivos);
+      } catch (error) {
+        console.error("Error al cargar productos:", error);
+        setMensaje({ texto: "Error al cargar productos disponibles.", tipo: false });
+        setTimeout(() => setMensaje(""), 4000);
+      }
+    };
 
     cargarProductos();
   }, []);
@@ -46,9 +48,8 @@ const PuntoDeVenta = () => {
   );
 
   const buscarCliente = async (cedula) => {
-
     if (!cedula) {
-      setMensaje("Por favor, ingrese la cédula del cliente.");
+      setMensaje({ texto: "Por favor, ingrese la cédula del cliente.", tipo: false });
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
@@ -59,18 +60,19 @@ const PuntoDeVenta = () => {
       const respuesta = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       if (respuesta.data && respuesta.data.length > 0) {
         setClienteSeleccionado(respuesta.data[0]);
-        setMensaje("");
+        setMensaje({ texto: "Cliente encontrado.", tipo: true });
+        setTimeout(() => setMensaje(""), 4000);
       } else {
-        setMensaje("Ocurrió un error al buscar el cliente.");
+        setMensaje({ texto: "No se encontró el cliente.", tipo: false });
         setTimeout(() => setMensaje(""), 4000);
       }
-      setBusquedaCliente("")
+      setBusquedaCliente("");
     } catch (error) {
       console.error("Error al buscar cliente:", error);
-      setMensaje("La cédula ingresada no corresponde a ningún cliente.");
+      setMensaje({ texto: "La cédula ingresada no corresponde a ningún cliente.", tipo: false });
       setTimeout(() => setMensaje(""), 4000);
     }
   };
@@ -80,31 +82,32 @@ const PuntoDeVenta = () => {
     const producto = productosDisponibles.find(
       (p) => p._id === productoSeleccionado
     );
-  
+
     if (!producto) {
-      setMensaje("Producto no encontrado");
+      setMensaje({ texto: "Producto no encontrado.", tipo: false });
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
-  
+
     if (cantidad <= 0) {
-      setMensaje("La cantidad debe ser mayor a 0.");
+      setMensaje({ texto: "La cantidad debe ser mayor a 0.", tipo: false });
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
-  
+
     if (producto.stock < cantidad) {
-      setMensaje(
-        `Stock insuficiente para ${producto.nombre}. Quedan ${producto.stock} unidades.`
-      );
+      setMensaje({
+        texto: `Stock insuficiente para ${producto.nombre}. Quedan ${producto.stock} unidades.`,
+        tipo: false,
+      });
       setTimeout(() => setMensaje(""), 4000);
       return;
     }
-  
+
     const existente = productosSeleccionados.find(
       (p) => p.producto_id === producto._id
     );
-  
+
     if (existente) {
       // Si el producto ya está en la lista, solo actualiza la cantidad
       existente.cantidad += cantidad;
@@ -118,17 +121,18 @@ const PuntoDeVenta = () => {
         cantidad: cantidad,
         subtotal: producto.precio * cantidad,
       };
-  
+
       setProductosSeleccionados([...productosSeleccionados, nuevoProducto]);
     }
-  
+
     setTotal(total + cantidad * producto.precio);
-  
+
     // Resetear campos
     setProductoSeleccionado("");
     setCantidad(1);
-    setMensaje("");
-    setBusqueda("");// Limpiar la búsqueda después de agregar el producto
+    setMensaje({ texto: "Producto agregado correctamente.", tipo: true });
+    setTimeout(() => setMensaje(""), 4000);
+    setBusqueda(""); // Limpiar la búsqueda después de agregar el producto
   };
 
   // Eliminar producto
@@ -141,12 +145,15 @@ const PuntoDeVenta = () => {
       productosSeleccionados.filter((p) => p.producto_id !== productoId)
     );
     setTotal(total - productoAEliminar.subtotal);
+    setMensaje({ texto: "Producto eliminado correctamente.", tipo: true });
+    setTimeout(() => setMensaje(""), 4000);
   };
 
   // Finalizar la venta
   const finalizarVenta = async () => {
     if (!clienteSeleccionado || productosSeleccionados.length === 0) {
-      setMensaje("Debe seleccionar un cliente y agregar al menos un producto.");
+      setMensaje({ texto: "Debe seleccionar un cliente y agregar al menos un producto.", tipo: false });
+      setTimeout(() => setMensaje(""), 4000);
       return;
     }
 
@@ -168,16 +175,17 @@ const PuntoDeVenta = () => {
     };
 
     try {
-      console.log(ventaData)
       await axios.post(url, ventaData, options);
-      alert("Venta realizada con éxito.");
+      setMensaje({ texto: "Venta realizada con éxito.", tipo: true });
       setProductosSeleccionados([]);
       setTotal(0);
       setClienteSeleccionado(null);
-      setBusquedaCliente("")
+      setBusquedaCliente("");
+      setTimeout(() => setMensaje(""), 4000);
     } catch (error) {
       console.error("Error al realizar la venta:", error);
-      setMensaje("Hubo un error al procesar la venta.");
+      setMensaje({ texto: "Hubo un error al procesar la venta.", tipo: false });
+      setTimeout(() => setMensaje(""), 4000);
     }
   };
 
@@ -186,7 +194,7 @@ const PuntoDeVenta = () => {
       <div className="max-w-4xl mx-auto p-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Punto de Venta</h2>
 
-        {mensaje && <Mensaje tipo={true}>{mensaje}</Mensaje>}
+        {mensaje.texto && <Mensaje tipo={mensaje.tipo}>{mensaje.texto}</Mensaje>}
 
         {!clienteSeleccionado ? (
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">

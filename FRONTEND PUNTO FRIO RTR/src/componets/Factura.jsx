@@ -72,7 +72,7 @@ const Factura = () => {
   const imprimirFactura = () => {
     const doc = new jsPDF();
     const venta = ventaSeleccionada;
-
+  
     // Estilo General del Documento
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
@@ -82,7 +82,7 @@ const Factura = () => {
     doc.text("RUC: 1234567890001", 105, 30, { align: "center" });
     doc.text("Dirección: Av. Principal, Quito, Ecuador", 105, 35, { align: "center" });
     doc.text("Teléfono: +593 9 9999 9999", 105, 40, { align: "center" });
-
+  
     // Información de la Venta
     doc.setFont("helvetica", "bold");
     doc.text("Información de la Venta", 20, 50);
@@ -90,19 +90,21 @@ const Factura = () => {
     doc.text(`Número de Factura: ${venta._id}`, 20, 60);
     doc.text(`Fecha: ${venta.fecha}`, 20, 65);
     doc.text(`Total: $${venta.total.toFixed(2)}`, 20, 70);
-
+    doc.text(`Atendido por: ${venta.usuario_id.nombre} ${venta.usuario_id.apellido}`, 20, 75); // Agregado
+  
     // Información del Cliente
     doc.setFont("helvetica", "bold");
-    doc.text("Información del Cliente", 20, 80);
+    doc.text("Información del Cliente", 20, 85);
     doc.setFont("helvetica", "normal");
     doc.text(
       `Nombre: ${venta.cliente_id.nombre} ${venta.cliente_id.apellido}`,
       20,
-      90
+      95
     );
+  
     doc.setFont("helvetica", "bold");
-    doc.text("Detalles de la Venta", 20, 100 );
-
+    doc.text("Detalles de la Venta", 20, 105);
+  
     // Detalles de la Venta (Usando autoTable)
     const detalles = venta.detalles.map((detalle) => [
       detalle.producto_id.nombre,
@@ -110,21 +112,21 @@ const Factura = () => {
       `$${detalle.precio_unitario.toFixed(2)}`,
       `$${detalle.total.toFixed(2)}`,
     ]);
-
+  
     doc.autoTable({
-      startY: 110,
+      startY: 115,
       head: [["Producto", "Cantidad", "Precio Unitario", "Total"]],
       body: detalles,
-      theme: "striped", // Tema para la tabla (striped, grid, plain)
-      styles: { fontSize: 12 }, // Tamaño de fuente para las tablas
-      headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] }, // Encabezado estilizado
+      theme: "striped",
+      styles: { fontSize: 12 },
+      headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] },
     });
-
+  
     // Mensaje Final
-    const finalY = doc.previousAutoTable.finalY + 10; // Posición después de la tabla
+    const finalY = doc.previousAutoTable.finalY + 10;
     doc.setFont("helvetica", "italic");
     doc.text("¡Gracias por su compra! Por favor, conserve esta factura como comprobante.", 20, finalY);
-
+  
     // Guardar PDF
     doc.save(`Factura_${venta._id}.pdf`);
   };
@@ -220,9 +222,9 @@ const Factura = () => {
       {/* Información de la Empresa */}
       <div className="mb-4">
         <h2 className="text-lg font-bold">Punto Frío R.T.R.</h2>
-        <p>RUC: 1234567890001</p>
-        <p>Dirección: Av. Principal, Quito, Ecuador</p>
-        <p>Teléfono: +593 9 9999 9999</p>
+        <p><strong>RUC:</strong> {import.meta.env.VITE_RUC}</p>
+        <p><strong>Dirección:</strong> {import.meta.env.VITE_DIRECCION}</p>
+        <p><strong>Teléfono:</strong> {import.meta.env.VITE_TELEFONO}</p>
       </div>
 
       {/* Información de la Venta */}
@@ -231,6 +233,7 @@ const Factura = () => {
         <p><strong>Número de Factura:</strong> {ventaSeleccionada._id}</p>
         <p><strong>Fecha:</strong> {ventaSeleccionada.fecha}</p>
         <p><strong>Total:</strong> ${ventaSeleccionada.total.toFixed(2)}</p>
+        <p><strong>Atendido por:</strong> {ventaSeleccionada.usuario_id.nombre} {ventaSeleccionada.usuario_id.apellido}</p>
       </div>
 
       {/* Información del Cliente */}
