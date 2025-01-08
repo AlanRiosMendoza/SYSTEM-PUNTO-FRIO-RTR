@@ -10,7 +10,6 @@ import Dashboard from './layout/Dashboard'
 import Listar from './paginas/Listar'
 import Crear from './paginas/Crear'
 import Perfil from './paginas/Perfil'
-import { Confirmar } from './paginas/Confirmar'
 import CajaDeVenta from './paginas/CajaDeVenta'
 import Restablecer from './paginas/Restablecer'
 
