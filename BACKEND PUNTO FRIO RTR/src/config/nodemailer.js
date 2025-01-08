@@ -31,7 +31,7 @@ const sendMailToUser = (userMail, resetCode) => {
         </p>
 
         <div style="text-align: center; margin: 20px 0;">
-            <a href="${process.env.URL_PRODUCTION}/recuperar-password/${resetCode}" style="text-decoration: none; background-color: #0056b3; color: #fff; padding: 12px 20px; border-radius: 5px; font-size: 16px;">Restablecer Contraseña</a>
+            <a href="${process.env.URL_PRODUCTION}/reset-password/${resetCode}" style="text-decoration: none; background-color: #0056b3; color: #fff; padding: 12px 20px; border-radius: 5px; font-size: 16px;">Restablecer Contraseña</a>
         </div>
 
         <p style="font-size: 14px; color: #888; text-align: center;">

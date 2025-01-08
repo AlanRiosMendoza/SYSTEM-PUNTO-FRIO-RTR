@@ -31,7 +31,7 @@ function App() {
           <Route path='/' element={<Auth/>}>
             <Route path='login' element={<Login/>}/>          
             <Route path='forgot/:id' element={<Forgot/>}/>
-            <Route path='recuperar-password/:token' element={<Restablecer/>}/>
+            <Route path='reset-password/:token' element={<Restablecer/>}/>
             <Route path='*' element={<NotFound />} />
           </Route>
 
