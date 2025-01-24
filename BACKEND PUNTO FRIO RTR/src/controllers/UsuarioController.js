@@ -152,7 +152,14 @@ export const obtenerUsuario = async (req, res) => {
       .status(404)
       .json({ msg: `No se encontró el usuario con ese ID: ${req.params.id}` })
 
-  res.status(200).json(usuario)
+  const usuarioObjeto = {
+    ...usuario.toObject(),
+    fechaUltimoAcceso: moment(usuario.fechaUltimoAcceso)
+      .tz('America/Guayaquil')
+      .format('YYYY-MM-DD HH:mm:ss'),
+  }
+
+  res.status(200).json(usuarioObjeto)
 }
 
 export const actualizarPerfil = async (req, res) => {
@@ -272,7 +279,20 @@ export const nuevoPassword = async (req, res) => {
 }
 
 export const perfil = async (req, res) => {
-  res.status(200).json(req.UsuarioSchema)
+  const usuarioObjeto = {
+    _id: req.UsuarioSchema._id,
+    nombre: req.UsuarioSchema.nombre,
+    apellido: req.UsuarioSchema.apellido,
+    correo: req.UsuarioSchema.correo,
+    cedula: req.UsuarioSchema.cedula,
+    telefono: req.UsuarioSchema.telefono,
+    rol: req.UsuarioSchema.rol,
+    activo: req.UsuarioSchema.activo,
+    fechaUltimoAcceso: moment(req.UsuarioSchema.fechaUltimoAcceso)
+      .tz('America/Guayaquil')
+      .format('YYYY-MM-DD HH:mm:ss'),
+  }
+  res.status(200).json(usuarioObjeto)
 }
 
 export const actualizarPassword = async (req, res) => {
