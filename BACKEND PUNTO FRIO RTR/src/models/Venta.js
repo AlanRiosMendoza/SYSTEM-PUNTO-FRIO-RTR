@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose'
 
 const ventaSchema = new Schema({
+  id : { type: Number },
   cliente_id: { type: Schema.Types.ObjectId, ref: 'Cliente' },
   usuario_id: { type: Schema.Types.ObjectId, ref: 'Usuario' },
   total: { type: Number },
