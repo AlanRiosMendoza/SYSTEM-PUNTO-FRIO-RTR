@@ -7,7 +7,7 @@ import {
 import productoSchema from '../models/Producto.js'
 
 export const crearDetalleInventario = async (req, res) => {
-  const { id: usuarioId } = req.UsuarioSchema
+  const { _id: usuario_id } = req.UsuarioSchema
   const idError = validarObjectId(req.body.producto_id)
   if (idError) return res.status(400).json({ msg: idError.message })
 
@@ -20,9 +20,13 @@ export const crearDetalleInventario = async (req, res) => {
   producto.stock += parseInt(req.body.cantidad)
   await producto.save()
 
-  const nuevoDetalleInventario = new detalleInventarioSchema(req.body)
-  nuevoDetalleInventario.usuario_id = usuarioId
-  nuevoDetalleInventario.tipo_movimiento = 'Entrada'
+  const nuevoDetalleInventario = new detalleInventarioSchema({
+    producto_id: req.body.producto_id,
+    cantidad: req.body.cantidad,
+    descripcion: req.body.descripcion,
+    usuario_id:usuario_id,
+    tipo_movimiento: 'Entrada',
+})
   await nuevoDetalleInventario.save()
 
   res.status(201).json({ msg: 'Detalle de inventario creado' })
