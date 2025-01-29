@@ -10,7 +10,8 @@ import {
 } from '../validators/ComunValidators.js'
 
 export const crearVenta = async (req, res) => {
-  const id = await VentaSchema.countDocuments() + 1
+  const documento = await VentaSchema.countDocuments() + 1
+  const id = String(documento).padStart(10, '0')
   const { cliente_id, productos } = req.body
   const { _id: usuario_id } = req.UsuarioSchema
 
