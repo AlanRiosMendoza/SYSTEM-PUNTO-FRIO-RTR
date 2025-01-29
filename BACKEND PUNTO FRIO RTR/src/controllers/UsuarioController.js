@@ -17,7 +17,6 @@ import {
 } from '../validators/ComunValidators.js'
 import moment from 'moment-timezone'
 
-
 export const registro = async (req, res) => {
   const camposVaciosError = validarCamposVacios(req.body)
   if (camposVaciosError)
@@ -164,58 +163,74 @@ export const obtenerUsuario = async (req, res) => {
 
 export const actualizarPerfil = async (req, res) => {
   try {
-    const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id);
+    const usuario = await UsuarioSchema.findById(req.UsuarioSchema._id)
 
-    const camposVaciosError = validarCamposVacios(req.body);
+    const camposVaciosError = validarCamposVacios(req.body)
     if (camposVaciosError)
-      return res.status(400).json({ msg: camposVaciosError.message });
+      return res.status(400).json({ msg: camposVaciosError.message })
 
     if (req.body.correo && req.body.correo !== usuario.correo) {
-      const correoError = validarCorreoElectronico(req.body.correo);
-      if (correoError) return res.status(400).json({ msg: correoError.message });
+      const correoError = validarCorreoElectronico(req.body.correo)
+      if (correoError) return res.status(400).json({ msg: correoError.message })
 
       // Verificar si el correo pertenece a otro usuario
-      const correoExistente = await UsuarioSchema.findOne({ correo: req.body.correo });
-      if (correoExistente && correoExistente._id.toString() !== usuario._id.toString()) {
-        return res.status(400).json({ msg: 'Ya existe un usuario con ese correo' });
+      const correoExistente = await UsuarioSchema.findOne({
+        correo: req.body.correo,
+      })
+      if (
+        correoExistente &&
+        correoExistente._id.toString() !== usuario._id.toString()
+      ) {
+        return res
+          .status(400)
+          .json({ msg: 'Ya existe un usuario con ese correo' })
       }
 
-      usuario.correo = req.body.correo;
+      usuario.correo = req.body.correo
     }
 
     if (req.body.cedula && req.body.cedula !== usuario.cedula) {
-      const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula');
-      if (cedulaError) return res.status(400).json({ msg: cedulaError.message });
-      usuario.cedula = req.body.cedula;
+      const cedulaError = validarLongitudNumero(req.body.cedula, 10, 'cédula')
+      if (cedulaError) return res.status(400).json({ msg: cedulaError.message })
+      usuario.cedula = req.body.cedula
     }
 
     if (req.body.nombre && req.body.nombre !== usuario.nombre) {
-      const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre');
-      if (nombreError) return res.status(400).json({ msg: nombreError.message });
-      usuario.nombre = req.body.nombre;
+      const nombreError = validarLongitudPalabra(req.body.nombre, 2, 'nombre')
+      if (nombreError) return res.status(400).json({ msg: nombreError.message })
+      usuario.nombre = req.body.nombre
     }
 
     if (req.body.apellido && req.body.apellido !== usuario.apellido) {
-      const apellidoError = validarLongitudPalabra(req.body.apellido, 2, 'apellido');
-      if (apellidoError) return res.status(400).json({ msg: apellidoError.message });
-      usuario.apellido = req.body.apellido;
+      const apellidoError = validarLongitudPalabra(
+        req.body.apellido,
+        2,
+        'apellido',
+      )
+      if (apellidoError)
+        return res.status(400).json({ msg: apellidoError.message })
+      usuario.apellido = req.body.apellido
     }
 
     if (req.body.telefono && req.body.telefono !== usuario.telefono) {
-      const telefonoError = validarLongitudNumero(req.body.telefono, 10, 'teléfono');
-      if (telefonoError) return res.status(400).json({ msg: telefonoError.message });
-      usuario.telefono = req.body.telefono;
+      const telefonoError = validarLongitudNumero(
+        req.body.telefono,
+        10,
+        'teléfono',
+      )
+      if (telefonoError)
+        return res.status(400).json({ msg: telefonoError.message })
+      usuario.telefono = req.body.telefono
     }
 
-    await usuario.save();
+    await usuario.save()
 
-    res.status(200).json({ msg: 'Usuario actualizado' });
+    res.status(200).json({ msg: 'Usuario actualizado' })
   } catch (error) {
-    console.error("Error al actualizar el usuario:", error);
-    res.status(500).json({ msg: 'Error interno del servidor' });
+    console.error('Error al actualizar el usuario:', error)
+    res.status(500).json({ msg: 'Error interno del servidor' })
   }
-};
-
+}
 
 export const recuperarPassword = async (req, res) => {
   const camposError = validarCamposVacios(req.body)
@@ -240,15 +255,15 @@ export const recuperarPassword = async (req, res) => {
 
 export const validarToken = async (req, res) => {
   try {
-    const usuario = await UsuarioSchema.findOne({ token: req.params.token });
+    const usuario = await UsuarioSchema.findOne({ token: req.params.token })
 
     if (!usuario) {
-      return res.status(404).json({ msg: 'Token no válido o expirado' });
+      return res.status(404).json({ msg: 'Token no válido o expirado' })
     }
 
-    res.status(200).json({ msg: 'Token válido' });
+    res.status(200).json({ msg: 'Token válido' })
   } catch (error) {
-    res.status(500).json({ msg: 'Error del servidor' });
+    res.status(500).json({ msg: 'Error del servidor' })
   }
 }
 

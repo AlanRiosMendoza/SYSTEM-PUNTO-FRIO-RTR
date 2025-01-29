@@ -40,13 +40,18 @@ export const obtenerPrestamosEnvase = async (req, res) => {
     return res.status(404).json({ msg: ExistenciaError.message })
 
   const prestamosEnvaseObjeto = prestamosEnvase.map((prestamoEnvase) => {
-    const fecha_devuelto = moment(prestamoEnvase.fecha_devuelto).tz('America/Guayaquil').format('DD/MM/YYYY HH:mm:ss')
-    const fecha_prestamo = moment(prestamoEnvase.fecha_prestamo).tz('America/Guayaquil').format('DD/MM/YYYY HH:mm:ss')
+    const fecha_devuelto = moment(prestamoEnvase.fecha_devuelto)
+      .tz('America/Guayaquil')
+      .format('DD/MM/YYYY HH:mm:ss')
+    const fecha_prestamo = moment(prestamoEnvase.fecha_prestamo)
+      .tz('America/Guayaquil')
+      .format('DD/MM/YYYY HH:mm:ss')
     return {
       ...prestamoEnvase.toObject(),
       fecha_devuelto,
       fecha_prestamo,
-    }})
+    }
+  })
 
   res.status(200).json(prestamosEnvaseObjeto)
 }
@@ -68,8 +73,12 @@ export const obtenerPrestamoEnvase = async (req, res) => {
 
   const prestamoObjeto = {
     ...prestamoEnvase.toObject(),
-    fecha_devuelto: moment(prestamoEnvase.fecha_devuelto).tz('America/Guayaquil').format('DD/MM/YYYY HH:mm:ss'),
-    fecha_prestamo: moment(prestamoEnvase.fecha_prestamo).tz('America/Guayaquil').format('DD/MM/YYYY HH:mm:ss'),
+    fecha_devuelto: moment(prestamoEnvase.fecha_devuelto)
+      .tz('America/Guayaquil')
+      .format('DD/MM/YYYY HH:mm:ss'),
+    fecha_prestamo: moment(prestamoEnvase.fecha_prestamo)
+      .tz('America/Guayaquil')
+      .format('DD/MM/YYYY HH:mm:ss'),
   }
 
   res.status(200).json(prestamoObjeto)
