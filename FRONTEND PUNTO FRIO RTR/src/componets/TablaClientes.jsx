@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ActualizarCliente from "./Modals/ActualizarCliente";
+import { MdUpdate } from "react-icons/md";
 
 const TablaClientes = ({ setMostrarTabla }) => {
   const [clientes, setClientes] = useState([]);
   const [pagina, setPagina] = useState(1);
-  const [limite] = useState(10);
+  const [limite] = useState(10); //limite de registro
   const [hayMas, setHayMas] = useState(true);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -69,7 +70,8 @@ const TablaClientes = ({ setMostrarTabla }) => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Clientes Registrados</h2>
-      <div className="overflow-x-auto">
+      <span className="flex"><MdUpdate className="h-7 w-7 text-blue-500 inline-block mr-2"/>Actualizar clientes</span>
+      <div className="overflow-x-auto mt-2">
         <table className="min-w-full divide-y divide-gray-200 border shadow-lg">
           <thead className="bg-gray-800 text-slate-400">
             <tr>
@@ -96,12 +98,10 @@ const TablaClientes = ({ setMostrarTabla }) => {
                 <td className="px-4 py-2 text-center">{cliente.telefono}</td>
                 <td className="px-4 py-2 text-center">{cliente.direccion}</td>
                 <td className="px-4 py-2 text-center">
-                  <button
+                  <MdUpdate
                     onClick={() => handleEditarCliente(cliente)}
-                    className="px-2 py-1 bg-blue-500 text-white rounded"
-                  >
-                    Editar
-                  </button>
+                    className="h-7 w-7 text-blue-500 cursor-pointer inline-block mr-2"
+                  />
                 </td>
               </tr>
             ))}

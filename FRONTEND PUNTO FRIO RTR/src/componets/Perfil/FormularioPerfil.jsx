@@ -53,7 +53,7 @@ const FormularioPerfil = () => {
     return (
         <form onSubmit={handleSubmit}>
             {Object.keys(mensaje).length > 0 && <Mensaje tipo={mensaje.tipo}>{mensaje.respuesta}</Mensaje>}
-
+            <h2 className="text-2xl font-bold mb-4">Actualiza tu perfil</h2>
             <div>
                 <label htmlFor="nombre" className="text-gray-700 uppercase font-bold text-sm">
                     Nombre:

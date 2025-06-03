@@ -59,12 +59,10 @@ const Password = () => {
 
     return (
         <>
-        <div className='mt-5'>
-            <h1 className='font-black text-3xl mb-6 text-gray-500'>Actualizar Contraseña</h1>
-        </div>
+            <h2 className="text-2xl font-bold mb-4">Actualiza tu contraseña</h2>
         <form  onSubmit={handleSubmit}>
 	     {Object.keys(mensaje).length > 0 && <Mensaje tipo={mensaje.tipo}>{mensaje.respuesta}</Mensaje>}
-             <div>
+            <div>
                 <label
                     htmlFor='passwordactual'
                     className='text-gray-700 uppercase font-bold text-sm'>Password actual: </label>

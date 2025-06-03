@@ -136,10 +136,15 @@ const Actualizar = ({ producto, isOpen, onClose, onUpdate }) => {
           <div className="mb-4">
             <label className="block text-sm font-medium">Precio</label>
             <input
-              type="number"
+              type="text"
               name="precio"
               value={formData.precio}
-              onChange={handleChange}
+              onChange={(e) => {
+                // Validación para permitir solo números y un punto decimal
+                if (/^\d*\.?\d{0,2}$/.test(e.target.value)) {
+                    handleChange(e);
+                }
+            }}
               className="w-full p-2 border rounded"
               min="0"
               required

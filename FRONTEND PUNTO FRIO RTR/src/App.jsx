@@ -16,6 +16,10 @@ import Restablecer from './paginas/Restablecer'
 import { AuthProvider } from './context/AuthProvider'
 import { PrivateRoute } from './routes/privateRoutes'
 import RoleBasedRoute from './context/RoleBasedRoute'
+import FormularioPerfil from './componets/Perfil/FormularioPerfil'
+import React from 'react'
+import { CardPerfil } from './componets/Perfil/CardPerfil'
+import Password from './componets/Perfil/Password'
 
 function App() {
   return (
@@ -38,7 +42,7 @@ function App() {
             <PrivateRoute>
               <Routes>
                 <Route element={<Dashboard/>}>
-                  <Route index element={<Perfil/>}/>
+                  <Route index element={<Listar/>}/>
                   <Route path='listar' element={<Listar/>}/>
                   <Route path='CajaDeVenta' element={<CajaDeVenta/>}/>
                   <Route path='crear' element={
@@ -51,6 +55,10 @@ function App() {
                       <Register/>
                     </RoleBasedRoute> 
                     }/>
+                    <Route path='perfil' element={<CardPerfil/>}/>
+                    <Route path='actualizar-perfil' element={<FormularioPerfil/>}/>
+                    <Route path='actualizar-contrasena' element={<Password/>}/>
+                    <Route path='*' element={<NotFound />} />
                 </Route>
               </Routes>
             </PrivateRoute>

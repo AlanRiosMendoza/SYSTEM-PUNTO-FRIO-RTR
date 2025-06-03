@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Mensaje from "./Alertas/Mensaje";
+import CrearCliente from "../componets/Modals/CrearCliente";
 
 const PuntoDeVenta = () => {
   const [productosDisponibles, setProductosDisponibles] = useState([]);
@@ -10,16 +11,17 @@ const PuntoDeVenta = () => {
   const [total, setTotal] = useState(0);
   const [mensaje, setMensaje] = useState({});
   const [busqueda, setBusqueda] = useState(""); // Estado para el filtro de búsqueda
-
+  const [mostrarModal, setMostrarModal] = useState(false); // Controla el modal
+  
   // Estados para manejar clientes
   const [busquedaCliente, setBusquedaCliente] = useState("");
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
 
   // Cargar productos desde el backend
   useEffect(() => {
-    const cargarProductos = async () => {
+  const cargarProductos = async () => {
       const token = localStorage.getItem("token");
-      const url = `${import.meta.env.VITE_BACKEND_URL}/productos`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/productos?limite=500`;
       const options = {
         headers: {
           "Content-Type": "application/json",
@@ -43,9 +45,11 @@ const PuntoDeVenta = () => {
   }, []);
 
   // Filtrar los productos según la búsqueda
-  const productosFiltrados = productosDisponibles.filter((producto) =>
-    producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  const productosFiltrados = useMemo(() => {
+    return productosDisponibles.filter((producto) =>
+        producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    );
+}, [productosDisponibles, busqueda]);
 
   const buscarCliente = async (cedula) => {
     if (!cedula) {
@@ -207,28 +211,46 @@ const PuntoDeVenta = () => {
               onChange={(e) => setBusquedaCliente(e.target.value)}
               className="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
             />
-            <button
-              onClick={() => buscarCliente(busquedaCliente)}
-              className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 rounded-md hover:bg-blue-600 transition"
-            >
-              Buscar
-            </button>
+            <div className="flex">
+              <button
+                onClick={() => buscarCliente(busquedaCliente)}
+                className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 mx-4 rounded-md hover:bg-blue-600 transition"
+              >
+                Buscar
+              </button>
+              <button
+                onClick={() => setMostrarModal(true)}
+                className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 mx-4 rounded-md hover:bg-blue-600 transition"
+              >
+                Crear Cliente
+              </button>
+            </div>
           </div>
         ) : (
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Cliente Seleccionado</h3>
-            <p>
-              <strong>Nombre:</strong> {clienteSeleccionado.nombre} {clienteSeleccionado.apellido}
-            </p>
-            <p>
-              <strong>Cédula:</strong> {clienteSeleccionado.cedula}
-            </p>
-            <button
-              onClick={() => setClienteSeleccionado()}
-              className="w-full sm:w-auto bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
-            >
-              Cambiar Cliente
-            </button>
+            <div className="mb-2">
+              <p>
+                <strong>Nombre:</strong> {clienteSeleccionado.nombre} {clienteSeleccionado.apellido}
+              </p>
+              <p>
+                <strong>Cédula:</strong> {clienteSeleccionado.cedula}
+              </p>
+            </div>
+            <div className="flex">
+              <button
+                onClick={() => setClienteSeleccionado()}
+                className="w-full sm:w-auto bg-red-500 text-white px-4 py-2 mb-2 mx-4 rounded-md hover:bg-red-600 transition"
+              >
+                Cambiar Cliente
+              </button>
+              <button
+                  onClick={() => setMostrarModal(true)}
+                  className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 mx-4 rounded-md hover:bg-blue-600 transition"
+                >
+                  Crear Cliente
+              </button>
+            </div>
           </div>
         )}
 
@@ -325,6 +347,11 @@ const PuntoDeVenta = () => {
           </button>
         </div>
       </div>
+      {/* Modal para crear cliente */}
+      <CrearCliente
+        mostrarModal={mostrarModal}
+        setMostrarModal={setMostrarModal}
+      />
     </div>
   );
 };

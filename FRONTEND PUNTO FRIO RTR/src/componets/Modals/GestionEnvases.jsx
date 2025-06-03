@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Mensaje from "../Alertas/Mensaje";
+import CrearCliente from "./CrearCliente";
 
 const GestionEnvases = () => {
   const [envases, setEnvases] = useState([]);
@@ -9,7 +10,8 @@ const GestionEnvases = () => {
   const [deposito_cantidad, setDeposito_cantidad] = useState("");
   const [busquedaCliente, setBusquedaCliente] = useState("");
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
-
+  const [mostrarModal, setMostrarModal] = useState(false); // Controla el modal
+  
   // Buscar cliente por cédula
   const buscarCliente = async (cedula) => {
     if (!cedula) {
@@ -148,6 +150,12 @@ const GestionEnvases = () => {
           >
             Buscar
           </button>
+          <button
+            onClick={() => setMostrarModal(true)}
+            className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 mx-4 rounded-md hover:bg-blue-600 transition"
+          >
+            Crear Cliente
+          </button>
         </div>
       ) : (
         <div className="max-w-4xl mb-4 mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -164,6 +172,12 @@ const GestionEnvases = () => {
             className="w-full sm:w-auto bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600 transition"
           >
             Cambiar Cliente
+          </button>
+          <button
+            onClick={() => setMostrarModal(true)}
+            className="w-full sm:w-auto bg-blue-500 text-white px-4 py-2 mb-2 mx-4 rounded-md hover:bg-blue-600 transition"
+          >
+            Crear Cliente
           </button>
         </div>
       )}
@@ -237,6 +251,11 @@ const GestionEnvases = () => {
           </tbody>
         </table>
       </div>
+      {/* Modal para crear cliente */}
+      <CrearCliente
+        mostrarModal={mostrarModal}
+        setMostrarModal={setMostrarModal}
+      />
     </div>
   );  
 };

@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { MdChangeCircle, MdUpdate, MdInfo } from "react-icons/md";
+import { MdUpdate, MdPendingActions } from "react-icons/md";
 import axios from "axios";
 import Mensaje from "./Alertas/Mensaje";
 import AuthContext from "../context/AuthProvider";
 import Actualizar from "./Modals/Actualizar";
 import Visualizar from "./Modals/Visualizar"
+import { AiOutlinePlusCircle } from "react-icons/ai";
 
 const Tabla = () => {
     const { auth } = useContext(AuthContext);
@@ -148,7 +149,7 @@ const Tabla = () => {
     return (
         <>
           {/* Radios de filtro */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
+          <div className="flex sm:flex-row justify-center items-center gap-4 mt-6">
             {["todos", "activos", "inactivos"].map((opcion) => (
               <label
                 key={opcion}
@@ -169,7 +170,13 @@ const Tabla = () => {
               </label>
             ))}
           </div>
-      
+          {auth.rol === "administrador" && (
+          <div className="flex justify-around mx-4 mt-4">
+            <span className="flex items-center"><AiOutlinePlusCircle className="h-7 w-7 text-blue-500"/>Añadir Stock</span>
+            <span className="flex items-center"><MdUpdate className="h-7 w-7 text-blue-500"/>Actualizar Producto</span>
+            <span className="flex items-center"><MdPendingActions className="h-7 w-7 text-red-500"/>Activar/Desactivar un producto</span>
+          </div>
+          )}
           {productosFiltrados.length === 0 ? (
             <Mensaje tipo="active">{"No existen registros"}</Mensaje>
           ) : (
@@ -187,7 +194,9 @@ const Tabla = () => {
                       <th className="p-2">Stock</th>
                       <th className="p-2">Retornable</th>
                       <th className="p-2">Activo</th>
-                      <th className="p-2">Acciones</th>
+                      {auth.rol === "administrador" && (
+                        <th className="p-2">Acciones</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -196,11 +205,11 @@ const Tabla = () => {
                         className="border-b hover:bg-gray-300 text-center text-sm"
                         key={producto._id}
                       >
-                        <td>{(pagina - 1) * limite + index + 1}</td>
-                        <td>{producto.nombre}</td>
-                        <td>{producto.precio}</td>
-                        <td>{producto.stock}</td>
-                        <td>{producto.retornable ? "Sí" : "No"}</td>
+                        <td className="py-2 text-center">{(pagina - 1) * limite + index + 1}</td>
+                        <td className="py-2 text-center">{producto.nombre}</td>
+                        <td className="py-2 text-center">{producto.precio}</td>
+                        <td className="py-2 text-center">{producto.stock}</td>
+                        <td className="py-2 text-center">{producto.retornable ? "Sí" : "No"}</td>
                         <td>
                           <span
                             className={`bg-blue-100 text-xs font-medium mr-2 px-2.5 py-0.5 rounded ${
@@ -210,34 +219,26 @@ const Tabla = () => {
                             {producto.activo ? "Activo" : "Inactivo"}
                           </span>
                         </td>
-                        <td className="py-2 text-center">
-                          <MdInfo
-                            className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
-                            onClick={() => handleOpenVisualizarModal(producto)}
-                          />
-                          {/* Modal Visualizar */}
-                          <Visualizar
-                            producto={productoVisualizar}
-                            isOpen={visualizarModalOpen}
-                            onClose={handleCloseVisualizarModal}
-                            onUpdate={listarProductos} // Refresca la lista después de actualizar
-                          />
-      
-                          {auth.rol === "administrador" && (
+                        {auth.rol === "administrador" && (
+                          <td className="py-2 text-center">
                             <>
+                              <AiOutlinePlusCircle
+                                className="h-7 w-7 cursor-pointer inline-block mr-2 text-blue-500"
+                                onClick={() => handleOpenVisualizarModal(producto)}
+                              />
                               <MdUpdate
-                                className="h-7 w-7 text-slate-800 cursor-pointer inline-block mr-2"
+                                className="h-7 w-7 text-blue-500 cursor-pointer inline-block mr-2"
                                 onClick={() => handleOpenModal(producto)}
                               />
-                              <MdChangeCircle
+                              <MdPendingActions
                                 className="h-7 w-7 text-red-400 cursor-pointer inline-block mr-2"
                                 onClick={() =>
                                   handleDelete(producto._id, producto.activo)
                                 }
                               />
                             </>
-                          )}
-                        </td>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -249,6 +250,13 @@ const Tabla = () => {
                 producto={productoSeleccionado}
                 isOpen={modalOpen}
                 onClose={handleCloseModal}
+                onUpdate={listarProductos} // Refresca la lista después de actualizar
+              />
+              {/* Modal Visualizar */}
+              <Visualizar
+                producto={productoVisualizar}
+                isOpen={visualizarModalOpen}
+                onClose={handleCloseVisualizarModal}
                 onUpdate={listarProductos} // Refresca la lista después de actualizar
               />
       

@@ -38,33 +38,30 @@ export const Forgot = () => {
 
     return (
         <div
-            className="flex justify-center items-center h-screen w-screen bg-cover bg-center"
-            style={{
-                backgroundImage: `url('/public/images/bottle-695375_1280.jpg')`,
-            }}
+            className="flex justify-center items-center h-screen w-screen bg-gradient-to-br from-[#b2ffff] via-[#59d8d4] to-[#337bb3]"
         >
-            <div className="w-full max-w-md bg-black/80 p-6 rounded-md">
+            <div className="w-full max-w-md p-6 rounded-md bg-white shadow-lg">
                 {/* Mensaje dinámico */}
                 {Object.keys(mensaje).length > 0 && (
                     <Mensaje tipo={mensaje.tipo}>{mensaje.respuesta}</Mensaje>
                 )}
 
                 {/* Título */}
-                <h1 className="text-3xl font-semibold mb-4 text-center uppercase text-gray-300">
+                <h1 className="text-3xl font-semibold mb-4 text-center uppercase text-gray-800">
                     Olvidaste tu contraseña
                 </h1>
-                <small className="text-gray-400 block mb-6 text-sm text-center">
+                <small className="text-gray-600 block mb-6 text-sm text-center">
                     No te preocupes, ingresa el correo para recuperar la contraseña.
                 </small>
 
                 {/* Formulario */}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="mb-2 block text-sm font-semibold text-gray-300">Correo</label>
+                        <label className="mb-2 block text-sm font-semibold text-gray-700">Correo</label>
                         <input
                             type="email"
                             placeholder="Ingrese el correo de registro"
-                            className="block w-full rounded-md border border-gray-600 focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400 py-2 px-3 bg-neutral-800 text-gray-200"
+                            className="block w-full rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 py-2 px-3 bg-gray-100 text-gray-800"
                             name="correo"
                             value={mail.correo}
                             onChange={handleChange}
@@ -72,21 +69,15 @@ export const Forgot = () => {
                     </div>
 
                     <div className="mb-6">
-                        <button className="w-full bg-gray-600 text-gray-300 border py-2 rounded-md hover:scale-105 duration-300 hover:bg-gray-700 hover:text-white">
+                        <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                             Enviar
                         </button>
                     </div>
                 </form>
 
                 {/* Redirección */}
-                <div className="text-sm flex justify-between items-center text-gray-300">
-                    <p>¿Ya tienes una cuenta?</p>
-                    <Link
-                        to="/login"
-                        className="py-2 px-4 bg-gray-600 text-gray-300 border rounded-md hover:scale-110 duration-300 hover:bg-gray-700 hover:text-white"
-                    >
-                        Iniciar sesión
-                    </Link>
+                <div className="text-sm text-center text-gray-700">
+                    <Link to="/login" className="underline hover:text-blue-600">¿Ya tienes una cuenta?</Link>
                 </div>
             </div>
         </div>
